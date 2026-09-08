@@ -1,0 +1,23 @@
+services:
+  mariadb:
+    image: mariadb:11
+    container_name: mediatheque-mariadb
+    env_file:
+      - .env
+    environment:
+      MARIADB_DATABASE: ${DB_NAME:-mediatheque}
+      MARIADB_USER: ${DB_USER:-mediatheque}
+      MARIADB_PASSWORD: ${DB_PASSWORD:-mediatheque}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+    ports:
+      - "3309:3309"
+    volumes:
+      - mediatheque_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  mediatheque_data:
