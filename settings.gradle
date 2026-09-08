@@ -1,1 +1,5 @@
-rootProject.name = 'Mediatech'
+rootProject.name = 'mediatheque-project'
+
+include 'user-service'
+include 'mediatheque-service'
+include 'event-service'

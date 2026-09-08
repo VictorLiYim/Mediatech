@@ -1,0 +1,3 @@
+// event-service — REST (événements, dédicaces, inscriptions) + JPA sur event_db.
+// Étape 5 : clients gRPC vers mediatheque-service (infos livre) et user-service (vérifier un userId).
+// La configuration commune (starters, toolchain, tests) est héritée du build.gradle racine (subprojects {}).

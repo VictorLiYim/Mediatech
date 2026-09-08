@@ -1,0 +1,3 @@
+// mediatheque-service — REST (livres, emprunts, notes, reviews) + JPA sur mediatheque_db.
+// Étape 5 : serveur gRPC BookInfoService + client gRPC vers user-service.
+// La configuration commune (starters, toolchain, tests) est héritée du build.gradle racine (subprojects {}).

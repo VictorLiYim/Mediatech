@@ -1,0 +1,3 @@
+// user-service — REST (comptes utilisateurs, login) + JPA sur user_db.
+// Étape 5 : serveur gRPC UserInfoService.
+// La configuration commune (starters, toolchain, tests) est héritée du build.gradle racine (subprojects {}).
