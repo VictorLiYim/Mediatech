@@ -1,3 +1,8 @@
 // user-service — REST (comptes utilisateurs, login) + JPA sur user_db.
 // Étape 5 : serveur gRPC UserInfoService.
 // La configuration commune (starters, toolchain, tests) est héritée du build.gradle racine (subprojects {}).
+
+dependencies {
+	// BCrypt seul, sans la chaîne de filtres Spring Security (les endpoints restent ouverts).
+	implementation 'org.springframework.security:spring-security-crypto'
+}
