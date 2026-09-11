@@ -1,6 +1,7 @@
 package com.events.models;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter(AccessLevel.NONE)
     private Long id;
     @Column(nullable = false)
     private String title;
@@ -23,7 +25,7 @@ public class Event {
     @Column(nullable = false)
     private LocalDateTime eventDate;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "event_type", nullable = false)
     private EventType type;
     @Column(nullable = false)
     private Long authorId;

@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.cglib.core.Local;
 
 @Entity
 @Table(name="loans")
@@ -19,7 +18,7 @@ public class Loan {
     private long id;
     @Column(name = "book_id", nullable = false)
     private Long bookId;
-    @Column(name = "userId", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
     @Column(name = "borrow_date", nullable = false)
     private LocalDate borrowDate;

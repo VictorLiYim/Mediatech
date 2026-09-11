@@ -26,7 +26,7 @@ public class RegistrationServiceImpl implements RegistrationService{
         this.eventService = eventService;
     }
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Registration register(Long eventId, Long userId){
         Event event = eventService.getById(eventId);
 
