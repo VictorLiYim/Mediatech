@@ -1,0 +1,151 @@
+:root {
+  --color-ink: #20201e;
+  --color-text-secondary: #55534e;
+  --color-lavender: #7c7891;
+  --color-lavender-bright: #9a8fd6;
+  --color-veil: #b1aec1;
+  --color-paper: #f2f0eb;
+  --color-white: #ffffff;
+}
+
+html {
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--color-ink);
+  background-color: #4c4278;
+  background-image: linear-gradient(160deg, #9186c9 0%, #5c50a0 35%, #2c2450 100%);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* ---- Text sitting directly on the dark backdrop (outside a .glass surface) ---- */
+.on-bg {
+  color: var(--color-white) !important;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.28);
+}
+
+.v-application,
+.v-application__wrap,
+.app-main {
+  background: transparent !important;
+}
+
+/* ---- Type scale ---- */
+.text-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1.2;
+}
+
+.text-subtitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.text-subtitle-3 {
+  font-size: 0.9rem;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.text-caption-brand {
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+/* ---- Liquid-glass surface, used for every panel/card in the app ---- */
+/* Painted translucency only (no backdrop-filter): a flat, predictable look
+   that doesn't depend on GPU blur compositing, which was causing rendering
+   artifacts (banding/flicker) across browsers. */
+.glass {
+  position: relative;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.46));
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(60, 50, 100, 0.18), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.glass--tight {
+  border-radius: 16px;
+}
+
+.glass-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--color-ink);
+  font-size: 1.05rem;
+}
+
+.glass-info {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(32, 32, 30, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-style: italic;
+  flex: none;
+}
+
+/* ---- Buttons: pill-shaped, two variants ---- */
+.btn-pill {
+  border-radius: 999px !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+}
+
+.btn-pill.v-btn--variant-flat {
+  background-image: linear-gradient(135deg, var(--color-lavender-bright), var(--color-lavender)) !important;
+  color: var(--color-white) !important;
+}
+
+.btn-pill.btn-pill--secondary {
+  background: rgba(255, 255, 255, 0.78) !important;
+  color: var(--color-ink) !important;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 0 0 1px rgba(124, 120, 145, 0.15) !important;
+}
+
+/* ---- Nav icons: ink glyphs ---- */
+.icon-ink,
+.icon-ink .v-icon {
+  color: var(--color-ink) !important;
+}
+
+.icon-ink input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* ---- Glass search field ---- */
+.search-glass .v-field {
+  background: rgba(255, 255, 255, 0.78) !important;
+  box-shadow: 0 8px 24px rgba(90, 80, 130, 0.15) !important;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+}
+
+.search-glass .v-field__overlay {
+  display: none;
+}
+
+/* ---- Book cover placeholder ---- */
+.cover-thumb {
+  flex: none;
+  border-radius: 8px;
+  background: linear-gradient(160deg, var(--color-lavender-bright), var(--color-veil));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
