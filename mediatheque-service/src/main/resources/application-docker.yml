@@ -1,9 +1,14 @@
 spring:
   datasource:
-    url: jdbc:mariadb://localhost:3309/${MEDIATHEQUE_DB_NAME:mediatheque_db}
+    url: jdbc:mariadb://mariadb:3306/${MEDIATHEQUE_DB_NAME:mediatheque_db}
     driver-class-name: org.mariadb.jdbc.Driver
     username: ${DB_USER:mediatheque}
     password: ${DB_PASSWORD:mediatheque}
+  grpc:
+    client:
+      channels:
+        user-service:
+          address: user-service:9091
   jpa:
     hibernate:
       ddl-auto: update

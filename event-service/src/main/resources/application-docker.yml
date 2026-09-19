@@ -1,8 +1,15 @@
 spring:
   datasource:
-    url: jdbc:mariadb://localhost:3309/${DB_NAME:event_db}
+    url: jdbc:mariadb://mariadb:3306/${DB_NAME:event_db}
     username: ${DB_USER:mediatheque}
     password: ${DB_PASSWORD:mediatheque}
+  grpc:
+    client:
+      channels:
+        user-service:
+          address: user-service:9091
+        mediatheque-service:
+          address: mediatheque-service:9090
   jpa:
     hibernate:
       ddl-auto: update

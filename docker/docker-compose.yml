@@ -9,8 +9,6 @@ services:
       MARIADB_USER: ${DB_USER:-mediatheque}
       MARIADB_PASSWORD: ${DB_PASSWORD:-mediatheque}
       MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
-    ports:
-      - "3309:3306"
     volumes:
       - mediatheque_data:/var/lib/mysql
       - ./init-databases.sql:/docker-entrypoint-initdb.d/init-databases.sql:ro
@@ -19,6 +17,91 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+    networks:
+      - app-network
+    # Pas de port publié : seul le réseau docker interne y accède (BDD jamais exposée à l'hôte).
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: mediatheque-phpmyadmin
+    environment:
+      PMA_HOST: mariadb
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    ports:
+      - "8090:80"
+    networks:
+      - app-network
+
+  user-service:
+    build:
+      context: ..
+      dockerfile: user-service/Dockerfile
+    container_name: mediatheque-user-service
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  mediatheque-service:
+    build:
+      context: ..
+      dockerfile: mediatheque-service/Dockerfile
+    container_name: mediatheque-mediatheque-service
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+    networks:
+      - app-network
+
+  event-service:
+    build:
+      context: ..
+      dockerfile: event-service/Dockerfile
+    container_name: mediatheque-event-service
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      user-service:
+        condition: service_started
+      mediatheque-service:
+        condition: service_started
+    networks:
+      - app-network
+
+  httpd:
+    build:
+      context: ..
+      dockerfile: docker/httpd/Dockerfile
+    container_name: mediatheque-httpd
+    ports:
+      - "80:80"
+    depends_on:
+      - user-service
+      - mediatheque-service
+      - event-service
+    networks:
+      - app-network
+    # Le seul service dont le port est exposé côté application : point d'entrée unique.
+
+networks:
+  app-network:
 
 volumes:
   mediatheque_data:
