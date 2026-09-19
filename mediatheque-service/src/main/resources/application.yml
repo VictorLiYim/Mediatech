@@ -3,6 +3,13 @@ spring:
     name: mediatheque-service
   profiles:
     active: dev
+  grpc:
+    server:
+      port: 9090
+    client:
+      channels:
+        user-service:
+          address: localhost:9091
 
 server:
   port: 8081

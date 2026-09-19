@@ -1,3 +1,11 @@
 // mediatheque-service — REST (livres, emprunts, notes, reviews) + JPA sur mediatheque_db.
 // Étape 5 : serveur gRPC BookInfoService + client gRPC vers user-service.
 // La configuration commune (starters, toolchain, tests) est héritée du build.gradle racine (subprojects {}).
+
+dependencies {
+    // Serveur gRPC : expose BookInfoService (port 9090) à event-service.
+    implementation 'org.springframework.grpc:spring-grpc-server-spring-boot-starter'
+
+    // Client gRPC : vérifie un userId auprès de user-service avant un emprunt/review.
+    implementation 'org.springframework.grpc:spring-grpc-client-spring-boot-starter'
+}

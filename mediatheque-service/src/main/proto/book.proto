@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package book;
+
+option java_package = "com.mediatheque.grpc";
+option java_multiple_files = true;
+
+service BookInfoService {
+  rpc getBook(BookRequest) returns (BookReply) {}
+}
+
+message BookRequest {
+  string bookId = 1;
+}
+
+message BookReply {
+  string title = 1;
+  string author = 2;
+}

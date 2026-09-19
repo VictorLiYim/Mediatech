@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mediatheque.exceptions.UserNotFoundException;
+import com.mediatheque.grpc.UserVerificationClient;
 import com.mediatheque.models.Review;
 import com.mediatheque.repositories.ReviewRepository;
 
@@ -17,16 +19,22 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final BookService bookService;
+    private final UserVerificationClient userVerificationClient;
 
-    public ReviewServiceImpl(ReviewRepository reviewRepository, BookService bookService) {
+    public ReviewServiceImpl(ReviewRepository reviewRepository, BookService bookService,
+                              UserVerificationClient userVerificationClient) {
         this.reviewRepository = reviewRepository;
         this.bookService = bookService;
+        this.userVerificationClient = userVerificationClient;
     }
 
     @Override
     @Transactional
     public Review postReview(Long bookId, Long userId, int rating, String comment) {
         log.debug("New review bookId={} userId={} rating={}", bookId, userId, rating);
+        if (!userVerificationClient.userExists(userId)) {
+            throw new UserNotFoundException(userId);
+        }
         bookService.getById(bookId); // vérifie l'existence, lève BookNotFoundException sinon
 
         Review review = new Review(bookId, userId, rating, comment);

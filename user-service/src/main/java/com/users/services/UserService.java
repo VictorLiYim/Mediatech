@@ -75,4 +75,12 @@ public class UserService {
 		return userRepository.findById(id)
 				.orElseThrow(() -> new UserNotFoundException(id));
 	}
+
+	/**
+	 * Vérifie l'existence d'un utilisateur sans lever d'exception (utilisé par le serveur gRPC).
+	 */
+	@Transactional(readOnly = true)
+	public boolean existsById(Long id) {
+		return userRepository.existsById(id);
+	}
 }

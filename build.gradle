@@ -3,6 +3,7 @@
 plugins {
 	id 'org.springframework.boot' version '4.1.1' apply false
 	id 'io.spring.dependency-management' version '1.1.7' apply false
+	id 'com.google.protobuf' version '0.10.0' apply false
 }
 
 allprojects {
@@ -19,10 +20,38 @@ subprojects {
 	apply plugin: 'java'
 	apply plugin: 'org.springframework.boot'
 	apply plugin: 'io.spring.dependency-management'
+	apply plugin: 'com.google.protobuf'
 
 	java {
 		toolchain {
 			languageVersion = JavaLanguageVersion.of(17)
+		}
+	}
+
+	// BOM Spring gRPC : fixe des versions cohérentes pour toutes les libs gRPC/Spring gRPC.
+	// Étape 5 : net.devh (prévu dans CONTEXT.md) n'est pas compatible Spring Boot 4 → on utilise
+	// le projet officiel Spring gRPC à la place (org.springframework.grpc).
+	dependencyManagement {
+		imports {
+			mavenBom 'org.springframework.grpc:spring-grpc-dependencies:1.0.3'
+		}
+	}
+
+	// Compile les .proto de src/main/proto en code Java (messages + stubs gRPC),
+	// généré dans build/generated/source/proto/main/{java,grpc}.
+	// Versions de protoc/protoc-gen-grpc-java alignées sur ce que spring-grpc-dependencies:1.0.3 attend
+	// (grpc.version=1.77.1, protobuf-java.version=4.33.4) pour éviter tout écart binaire.
+	protobuf {
+		protoc {
+			artifact = 'com.google.protobuf:protoc:4.33.4'
+		}
+		plugins {
+			grpc {
+				artifact = 'io.grpc:protoc-gen-grpc-java:1.77.1'
+			}
+		}
+		generateProtoTasks {
+			all()*.plugins { grpc {} }
 		}
 	}
 

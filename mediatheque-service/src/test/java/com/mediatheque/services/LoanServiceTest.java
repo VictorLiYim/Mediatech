@@ -3,6 +3,7 @@ package com.mediatheque.services;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.mediatheque.exceptions.BookNotCurrentlyBorrowedException;
+import com.mediatheque.exceptions.UserNotFoundException;
+import com.mediatheque.grpc.UserVerificationClient;
 import com.mediatheque.models.Loan;
 import com.mediatheque.repositories.LoanRepository;
 
@@ -29,11 +32,15 @@ class LoanServiceTest {
 	@Mock
 	private BookService bookService;
 
+	@Mock
+	private UserVerificationClient userVerificationClient;
+
 	@InjectMocks
 	private LoanServiceImpl loanService;
 
 	@Test
 	void borrowBook_borrowsCopyAndSavesLoan() {
+		when(userVerificationClient.userExists(42L)).thenReturn(true);
 		when(loanRepository.save(any(Loan.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		Loan loan = loanService.borrowBook(1L, 42L);
@@ -42,6 +49,16 @@ class LoanServiceTest {
 		assertThat(loan.getBookId()).isEqualTo(1L);
 		assertThat(loan.getUserId()).isEqualTo(42L);
 		assertThat(loan.getDueDate()).isEqualTo(LocalDate.now().plusWeeks(3));
+	}
+
+	@Test
+	void borrowBook_whenUserDoesNotExist_throwsUserNotFoundAndNeverTouchesBook() {
+		when(userVerificationClient.userExists(42L)).thenReturn(false);
+
+		assertThatThrownBy(() -> loanService.borrowBook(1L, 42L))
+				.isInstanceOf(UserNotFoundException.class);
+
+		verify(bookService, never()).borrowCopy(any());
 	}
 
 	@Test

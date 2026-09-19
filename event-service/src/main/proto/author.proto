@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package author;
+
+option java_package = "com.events.grpc";
+option java_multiple_files = true;
+
+service AuthorInfoService {
+  rpc getAuthor(AuthorRequest) returns (AuthorReply) {}
+}
+
+message AuthorRequest {
+  string authorId = 1;
+}
+
+message AuthorReply {
+  string name = 1;
+  string bio = 2;
+}

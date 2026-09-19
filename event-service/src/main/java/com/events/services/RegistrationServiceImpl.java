@@ -2,6 +2,8 @@ package com.events.services;
 
 import com.events.exceptions.AlreadyRegisteredException;
 import com.events.exceptions.EventFullException;
+import com.events.exceptions.UserNotFoundException;
+import com.events.grpc.UserVerificationClient;
 import com.events.models.Event;
 import com.events.models.Registration;
 import com.events.repositories.RegistrationRepository;
@@ -20,14 +22,20 @@ public class RegistrationServiceImpl implements RegistrationService{
 
     private final RegistrationRepository registrationRepository;
     private final EventService eventService;
+    private final UserVerificationClient userVerificationClient;
 
-    public RegistrationServiceImpl(RegistrationRepository registrationRepository, EventService eventService){
+    public RegistrationServiceImpl(RegistrationRepository registrationRepository, EventService eventService,
+                                    UserVerificationClient userVerificationClient){
         this.registrationRepository = registrationRepository;
         this.eventService = eventService;
+        this.userVerificationClient = userVerificationClient;
     }
     @Override
     @Transactional
     public Registration register(Long eventId, Long userId){
+        if (!userVerificationClient.userExists(userId)) {
+            throw new UserNotFoundException(userId);
+        }
         Event event = eventService.getById(eventId);
 
         if(registrationRepository.existsByEventIdAndUserId(eventId, userId)){

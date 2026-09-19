@@ -3,6 +3,9 @@ spring:
     name: user-service
   profiles:
     active: dev
+  grpc:
+    server:
+      port: 9091
 
 server:
   port: 8083

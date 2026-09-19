@@ -5,4 +5,7 @@
 dependencies {
 	// BCrypt seul, sans la chaîne de filtres Spring Security (les endpoints restent ouverts).
 	implementation 'org.springframework.security:spring-security-crypto'
+
+	// Serveur gRPC : expose UserInfoService (port 9091) aux autres services.
+	implementation 'org.springframework.grpc:spring-grpc-server-spring-boot-starter'
 }

@@ -1,7 +1,9 @@
 package com.mediatheque.services;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -13,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.mediatheque.exceptions.UserNotFoundException;
+import com.mediatheque.grpc.UserVerificationClient;
 import com.mediatheque.models.Review;
 import com.mediatheque.repositories.ReviewRepository;
 
@@ -25,11 +29,15 @@ class ReviewServiceTest {
 	@Mock
 	private BookService bookService;
 
+	@Mock
+	private UserVerificationClient userVerificationClient;
+
 	@InjectMocks
 	private ReviewServiceImpl reviewService;
 
 	@Test
 	void postReview_savesReviewAndRecomputesAverageRating() {
+		when(userVerificationClient.userExists(42L)).thenReturn(true);
 		Review saved = new Review(1L, 42L, 5, "Un chef-d'œuvre");
 		when(reviewRepository.save(any(Review.class))).thenReturn(saved);
 		when(reviewRepository.findByBookId(1L)).thenReturn(List.of(saved));
@@ -43,6 +51,7 @@ class ReviewServiceTest {
 
 	@Test
 	void postReview_averagesMultipleRatings() {
+		when(userVerificationClient.userExists(42L)).thenReturn(true);
 		Review existing = new Review(1L, 7L, 3, "Bien");
 		Review saved = new Review(1L, 42L, 5, "Un chef-d'œuvre");
 		when(reviewRepository.save(any(Review.class))).thenReturn(saved);
@@ -51,6 +60,16 @@ class ReviewServiceTest {
 		reviewService.postReview(1L, 42L, 5, "Un chef-d'œuvre");
 
 		verify(bookService).updateAverageRating(1L, 4.0);
+	}
+
+	@Test
+	void postReview_whenUserDoesNotExist_throwsUserNotFoundAndNeverTouchesBook() {
+		when(userVerificationClient.userExists(42L)).thenReturn(false);
+
+		assertThatThrownBy(() -> reviewService.postReview(1L, 42L, 5, "Un chef-d'œuvre"))
+				.isInstanceOf(UserNotFoundException.class);
+
+		verify(bookService, never()).getById(any());
 	}
 
 	@Test

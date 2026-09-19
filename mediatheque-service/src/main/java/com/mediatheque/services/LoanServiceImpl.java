@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.mediatheque.exceptions.BookNotCurrentlyBorrowedException;
+import com.mediatheque.exceptions.UserNotFoundException;
+import com.mediatheque.grpc.UserVerificationClient;
 import com.mediatheque.models.Loan;
 import com.mediatheque.repositories.LoanRepository;
 
@@ -21,16 +23,22 @@ public class LoanServiceImpl implements LoanService {
 
     private final LoanRepository loanRepository;
     private final BookService bookService;
+    private final UserVerificationClient userVerificationClient;
 
-    public LoanServiceImpl(LoanRepository loanRepository, BookService bookService) {
+    public LoanServiceImpl(LoanRepository loanRepository, BookService bookService,
+                            UserVerificationClient userVerificationClient) {
         this.loanRepository = loanRepository;
         this.bookService = bookService;
+        this.userVerificationClient = userVerificationClient;
     }
 
     @Override
     @Transactional
     public Loan borrowBook(Long bookId, Long userId) {
         log.debug("Borrow attempt bookId={} userId={}", bookId, userId);
+        if (!userVerificationClient.userExists(userId)) {
+            throw new UserNotFoundException(userId);
+        }
         bookService.borrowCopy(bookId); // vérifie existence + dispo, lève l'exception sinon
 
         LocalDate today = LocalDate.now();

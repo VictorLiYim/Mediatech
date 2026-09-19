@@ -1,3 +1,8 @@
 // event-service — REST (événements, dédicaces, inscriptions) + JPA sur event_db.
-// Étape 5 : clients gRPC vers mediatheque-service (infos livre) et user-service (vérifier un userId).
+// Étape 5 : clients gRPC vers mediatheque-service (infos auteur) et user-service (vérifier un userId).
 // La configuration commune (starters, toolchain, tests) est héritée du build.gradle racine (subprojects {}).
+
+dependencies {
+    // Client gRPC uniquement : event-service n'expose aucun serveur gRPC (voir CONTEXT.md).
+    implementation 'org.springframework.grpc:spring-grpc-client-spring-boot-starter'
+}

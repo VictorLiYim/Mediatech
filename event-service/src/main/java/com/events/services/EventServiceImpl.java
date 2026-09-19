@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.events.exceptions.AuthorNotFoundException;
 import com.events.exceptions.EventNotFoundException;
+import com.events.grpc.AuthorVerificationClient;
 import com.events.models.Event;
 import com.events.models.EventType;
 import com.events.repositories.EventRepository;
@@ -19,14 +21,20 @@ public class EventServiceImpl implements EventService{
     private static final Logger log = LoggerFactory.getLogger(EventServiceImpl.class);
 
     private final EventRepository eventRepository;
-    public EventServiceImpl(EventRepository eventRepository){
+    private final AuthorVerificationClient authorVerificationClient;
+
+    public EventServiceImpl(EventRepository eventRepository, AuthorVerificationClient authorVerificationClient){
         this.eventRepository = eventRepository;
+        this.authorVerificationClient = authorVerificationClient;
     }
     @Override
     @Transactional
     public Event createEvent(String title, String description, LocalDateTime eventDate, EventType type,
                              Long authorId, int capacity){
         log.debug("Creating event title={} type={}", title, type);
+        if (!authorVerificationClient.authorExists(authorId)) {
+            throw new AuthorNotFoundException(authorId);
+        }
         Event event = new Event(title, description, eventDate, type, authorId, capacity);
         Event saved = eventRepository.save(event);
         log.info("Created event id={} title={}", saved.getId(), saved.getTitle());
