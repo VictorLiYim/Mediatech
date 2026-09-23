@@ -1,0 +1,40 @@
+:root {
+  --color-background-start: #a49bd3;
+  --color-background-end: #6a5c98;
+
+  --color-surface: rgba(255, 255, 255, 0.42);
+  --color-surface-strong: rgba(255, 255, 255, 0.68);
+  --color-surface-border: rgba(255, 255, 255, 0.6);
+  --color-header: rgba(236, 231, 252, 0.82);
+
+  --color-text: #221c36;
+  --color-text-muted: #4d4568;
+  --color-text-on-dark: #ffffff;
+
+  --color-primary: #4f3f8f;
+  --color-primary-hover: #3f3175;
+  --color-primary-soft: rgba(79, 63, 143, 0.14);
+
+  --color-success: #1f7a4d;
+  --color-success-soft: rgba(31, 122, 77, 0.14);
+  --color-warning: #9a5b00;
+  --color-warning-soft: rgba(154, 91, 0, 0.14);
+  --color-danger: #b3261e;
+  --color-danger-soft: rgba(179, 38, 30, 0.12);
+  --color-favorite: #d6336c;
+  --color-star: #e8a317;
+
+  --radius-small: 10px;
+  --radius-medium: 18px;
+  --radius-large: 28px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 8px 30px rgba(38, 25, 84, 0.18);
+  --shadow-card-hover: 0 14px 40px rgba(38, 25, 84, 0.28);
+  --blur-glass: blur(14px);
+
+  --font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --page-max-width: 1200px;
+  --header-height: 68px;
+  --transition-fast: 150ms ease;
+}

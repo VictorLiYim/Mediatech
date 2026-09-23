@@ -1,173 +1,378 @@
-<template>
-  <v-container class="mt-6 mb-10" v-if="book">
-    <v-btn variant="text" prepend-icon="mdi-arrow-left" :to="{ name: 'books' }" class="on-bg mb-4">
-      Retour au catalogue
-    </v-btn>
-
-    <v-row>
-      <v-col cols="12" md="8">
-        <article class="glass pa-6">
-        <div class="d-flex ga-4">
-          <div class="cover-thumb" style="width: 72px; height: 100px">
-            <v-icon icon="mdi-book-open-page-variant" color="white" size="32" />
-          </div>
-          <div>
-            <h1 class="text-title font-italic">{{ book.title }}</h1>
-            <p class="text-caption-brand">{{ authorNames }}</p>
-            <v-rating :model-value="book.averageRating ?? 0" density="compact" readonly half-increments color="primary" class="mt-1" />
-          </div>
-        </div>
-
-        <div class="mt-4">
-          <v-chip v-for="genre in book.genres" :key="genre" size="small" variant="tonal" color="secondary" class="mr-1 mb-1">{{ genre }}</v-chip>
-        </div>
-
-        <p class="mt-4">{{ book.description }}</p>
-
-        <v-alert v-if="actionError" type="error" density="compact" class="mt-4">{{ actionError }}</v-alert>
-
-        <v-chip :color="book.availableCopies > 0 ? 'success' : 'error'" class="mt-4 mr-4" variant="tonal">
-          {{ book.availableCopies }} / {{ book.totalCopies }} exemplaire(s) disponible(s)
-        </v-chip>
-
-        <v-btn
-            v-if="!activeLoan"
-            variant="flat"
-            class="btn-pill mt-4"
-            :disabled="book.availableCopies <= 0"
-            :loading="actionLoading"
-            @click="handleBorrow"
-        >
-          Emprunter
-        </v-btn>
-        <v-btn v-else class="btn-pill btn-pill--secondary mt-4" variant="flat" :loading="actionLoading" @click="handleReturn">
-          Rendre (emprunté le {{ activeLoan.borrowDate }})
-        </v-btn>
-        </article>
-      </v-col>
-    </v-row>
-
-    <v-divider class="my-6" />
-
-    <h2 class="text-subtitle on-bg mb-4">Avis des lecteurs</h2>
-
-    <v-alert v-if="reviewError" type="error" density="compact" class="mb-4">{{ reviewError }}</v-alert>
-
-    <article class="glass pa-4 mb-6" style="max-width: 500px">
-      <p class="text-subtitle-3 mb-2">Laisser un avis</p>
-      <v-rating v-model="newRating" density="comfortable" />
-      <v-textarea v-model="newComment" label="Commentaire" variant="outlined" rows="3" />
-      <v-btn variant="flat" class="btn-pill" :loading="submittingReview" :disabled="!newRating" @click="handlePostReview">
-        Publier
-      </v-btn>
-    </article>
-
-    <article v-if="reviews.length" class="glass pa-2">
-      <v-list bg-color="transparent">
-        <v-list-item v-for="review in reviews" :key="review.id">
-          <template #prepend>
-            <v-rating :model-value="review.rating" density="compact" size="small" readonly />
-          </template>
-          <v-list-item-title>{{ review.comment || "(sans commentaire)" }}</v-list-item-title>
-          <v-list-item-subtitle>Utilisateur #{{ review.userId }}</v-list-item-subtitle>
-        </v-list-item>
-      </v-list>
-    </article>
-    <p v-else class="glass pa-4 text-caption-brand">Aucun avis pour le moment.</p>
-  </v-container>
-
-  <v-container v-else-if="loadError" class="mt-6">
-    <v-alert type="error">{{ loadError }}</v-alert>
-  </v-container>
-</template>
-
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import { useUserStore } from "@/stores/user";
-import { extractErrorMessage } from "@/api/client";
-import { getBook, borrowBook, returnBook, getReviews, postReview, getLoansForUser } from "@/api/books";
+import { computed, onMounted, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import { mdiArrowLeft, mdiBookPlus, mdiCheck } from '@mdi/js'
+import { extractErrorMessage } from '@/api/client'
+import { borrowBook, fetchBook, fetchLoans, fetchReviews, postReview, returnBook } from '@/api/booksApi'
+import { coverUrlFromIsbn, fetchFirstPublishYearByIsbn } from '@/api/openLibraryApi'
+import { fetchUser } from '@/api/usersApi'
+import AppIcon from '@/components/AppIcon.vue'
+import BookCover from '@/components/BookCover.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import StarRating from '@/components/StarRating.vue'
+import StatusMessage from '@/components/StatusMessage.vue'
+import { formatDate } from '@/utils/dates'
+import { BOOK_TYPE_LABELS, GENRE_LABELS } from '@/utils/labels'
+import { libraryItemFromStockBook } from '@/utils/libraryItems'
 
-const route = useRoute();
-const userStore = useUserStore();
-const bookId = route.params.id;
+const props = defineProps({
+  bookId: { type: String, required: true },
+})
 
-const book = ref(null);
-const reviews = ref([]);
-const activeLoan = ref(null);
-const loadError = ref("");
-const actionError = ref("");
-const reviewError = ref("");
-const actionLoading = ref(false);
-const submittingReview = ref(false);
-const newRating = ref(0);
-const newComment = ref("");
+const store = useStore()
+const route = useRoute()
+const router = useRouter()
 
-const authorNames = computed(() => book.value?.authors?.map((a) => a.name).join(", ") || "Auteur inconnu");
+const book = ref(null)
+const publishYear = ref(null)
+const reviews = ref([])
+const reviewerNames = reactive({})
+const activeLoan = ref(null)
+const isLoading = ref(true)
+const loadError = ref('')
+const actionMessage = ref(null)
+const isProcessingLoan = ref(false)
 
-async function loadBook() {
-  book.value = await getBook(bookId);
+const reviewForm = reactive({ rating: 0, comment: '' })
+const reviewError = ref('')
+const isPostingReview = ref(false)
+
+const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
+const currentUserId = computed(() => store.getters['auth/currentUserId'])
+const authorNames = computed(() => book.value?.authors.map((author) => author.name).join(', ') ?? '')
+const libraryItem = computed(() => (book.value ? libraryItemFromStockBook({ ...book.value, year: publishYear.value }) : null))
+const isInLibrary = computed(() => libraryItem.value && store.getters['library/isInLibrary'](libraryItem.value.id))
+const sortedReviews = computed(() => [...reviews.value].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
+
+function requireLogin() {
+  router.push({ name: 'login', query: { redirect: route.fullPath } })
 }
 
-async function loadReviews() {
-  reviews.value = await getReviews(bookId);
+async function loadReviewerNames() {
+  const unknownIds = [...new Set(reviews.value.map((review) => review.userId))].filter((id) => !reviewerNames[id])
+  await Promise.all(unknownIds.map(async (userId) => {
+    try {
+      reviewerNames[userId] = (await fetchUser(userId)).userName
+    } catch {
+      reviewerNames[userId] = `Lecteur n°${userId}`
+    }
+  }))
 }
 
 async function loadActiveLoan() {
-  const loans = await getLoansForUser(userStore.currentUser.id);
-  activeLoan.value = loans.find((loan) => String(loan.bookId) === String(bookId) && !loan.returnDate) ?? null;
+  if (!isAuthenticated.value) return
+  const loans = await fetchLoans(currentUserId.value)
+  activeLoan.value = loans.find((loan) => loan.bookId === book.value.id && !loan.returnDate) ?? null
 }
 
-async function handleBorrow() {
-  actionError.value = "";
-  actionLoading.value = true;
+async function refreshBook() {
+  book.value = await fetchBook(props.bookId)
+  store.commit('catalog/UPDATE_BOOK', book.value)
+}
+
+async function toggleLoan() {
+  if (!isAuthenticated.value) return requireLogin()
+  isProcessingLoan.value = true
+  actionMessage.value = null
   try {
-    await borrowBook(bookId, userStore.currentUser.id);
-    await Promise.all([loadBook(), loadActiveLoan()]);
+    if (activeLoan.value) {
+      await returnBook(book.value.id, currentUserId.value)
+      activeLoan.value = null
+      actionMessage.value = { type: 'success', text: 'Livre rendu, merci !' }
+    } else {
+      activeLoan.value = await borrowBook(book.value.id, currentUserId.value)
+      actionMessage.value = { type: 'success', text: `Emprunt enregistré, à rendre avant le ${formatDate(activeLoan.value.dueDate)}.` }
+    }
+    await refreshBook()
   } catch (error) {
-    actionError.value = extractErrorMessage(error, "Emprunt impossible");
+    actionMessage.value = { type: 'error', text: extractErrorMessage(error) }
   } finally {
-    actionLoading.value = false;
+    isProcessingLoan.value = false
   }
 }
 
-async function handleReturn() {
-  actionError.value = "";
-  actionLoading.value = true;
-  try {
-    await returnBook(bookId, userStore.currentUser.id);
-    await Promise.all([loadBook(), loadActiveLoan()]);
-  } catch (error) {
-    actionError.value = extractErrorMessage(error, "Retour impossible");
-  } finally {
-    actionLoading.value = false;
-  }
+function addToLibrary() {
+  if (!isAuthenticated.value) return requireLogin()
+  store.dispatch('library/addItem', libraryItem.value)
 }
 
-async function handlePostReview() {
-  reviewError.value = "";
-  submittingReview.value = true;
+async function submitReview() {
+  reviewError.value = ''
+  if (reviewForm.rating === 0) {
+    reviewError.value = 'Choisissez une note entre 1 et 5 étoiles.'
+    return
+  }
+  isPostingReview.value = true
   try {
-    await postReview(bookId, {
-      userId: userStore.currentUser.id,
-      rating: newRating.value,
-      comment: newComment.value,
-    });
-    newRating.value = 0;
-    newComment.value = "";
-    await Promise.all([loadReviews(), loadBook()]);
+    const review = await postReview(book.value.id, {
+      userId: currentUserId.value,
+      rating: reviewForm.rating,
+      comment: reviewForm.comment.trim(),
+    })
+    reviews.value.push(review)
+    reviewForm.rating = 0
+    reviewForm.comment = ''
+    await Promise.all([refreshBook(), loadReviewerNames()])
   } catch (error) {
-    reviewError.value = extractErrorMessage(error, "Impossible de publier l'avis");
+    reviewError.value = extractErrorMessage(error, "Impossible d'envoyer l'avis")
   } finally {
-    submittingReview.value = false;
+    isPostingReview.value = false
   }
 }
 
 onMounted(async () => {
   try {
-    await Promise.all([loadBook(), loadReviews(), loadActiveLoan()]);
+    await refreshBook()
+    reviews.value = await fetchReviews(props.bookId)
+    await Promise.all([loadReviewerNames(), loadActiveLoan()])
   } catch (error) {
-    loadError.value = extractErrorMessage(error, "Livre introuvable");
+    loadError.value = extractErrorMessage(error, 'Livre introuvable')
+  } finally {
+    isLoading.value = false
   }
-});
+  if (book.value) {
+    fetchFirstPublishYearByIsbn(book.value.isbn).then((year) => { publishYear.value = year }).catch(() => {})
+  }
+})
 </script>
+
+<template>
+  <div class="page-container book-detail-view">
+    <RouterLink :to="{ name: 'catalog' }" class="book-detail-view__back-link">
+      <AppIcon :path="mdiArrowLeft" :size="18" /> Retour au catalogue
+    </RouterLink>
+
+    <LoadingSpinner v-if="isLoading" />
+    <StatusMessage v-else-if="loadError" :message="loadError" />
+
+    <template v-else-if="book">
+      <article class="book-detail-view__summary glass-panel">
+        <BookCover :src="coverUrlFromIsbn(book.isbn, 'L')" :title="book.title" size="large" />
+
+        <div class="book-detail-view__information">
+          <span class="book-detail-view__type">{{ BOOK_TYPE_LABELS[book.type] ?? book.type }}</span>
+          <h1 class="book-detail-view__title">{{ book.title }}</h1>
+          <p class="book-detail-view__authors">
+            {{ authorNames }}<template v-if="publishYear"> · {{ publishYear }}</template>
+          </p>
+
+          <div class="book-detail-view__rating">
+            <StarRating :model-value="book.averageRating" readonly />
+            <span>{{ reviews.length ? `${book.averageRating.toFixed(1)} / 5 · ${reviews.length} avis` : 'Pas encore noté' }}</span>
+          </div>
+
+          <div class="book-detail-view__genres">
+            <span v-for="genre in book.genres" :key="genre" class="badge">{{ GENRE_LABELS[genre] ?? genre }}</span>
+          </div>
+
+          <p v-if="book.description" class="book-detail-view__description">{{ book.description }}</p>
+
+          <div class="book-detail-view__stock">
+            <span class="badge" :class="book.availableCopies > 0 ? 'badge--success' : 'badge--danger'">
+              {{ book.availableCopies }} / {{ book.totalCopies }} exemplaire(s) disponible(s)
+            </span>
+            <span v-if="activeLoan" class="badge badge--warning">
+              Emprunté par vous · à rendre le {{ formatDate(activeLoan.dueDate) }}
+            </span>
+          </div>
+
+          <StatusMessage v-if="actionMessage" :type="actionMessage.type" :message="actionMessage.text" />
+
+          <div class="book-detail-view__actions">
+            <button
+              type="button"
+              class="button button--primary"
+              :disabled="isProcessingLoan || (!activeLoan && book.availableCopies === 0)"
+              @click="toggleLoan"
+            >
+              {{ activeLoan ? 'Rendre ce livre' : 'Emprunter' }}
+            </button>
+            <button type="button" class="button button--secondary" :disabled="isInLibrary" @click="addToLibrary">
+              <AppIcon :path="isInLibrary ? mdiCheck : mdiBookPlus" :size="18" />
+              {{ isInLibrary ? 'Dans ma bibliothèque' : 'Ajouter à ma bibliothèque' }}
+            </button>
+          </div>
+        </div>
+      </article>
+
+      <section class="book-detail-view__reviews glass-panel">
+        <h2 class="book-detail-view__section-title">Avis des lecteurs</h2>
+
+        <form v-if="isAuthenticated" class="book-detail-view__review-form" @submit.prevent="submitReview">
+          <div class="form-field">
+            <span class="form-label">Votre note</span>
+            <StarRating v-model="reviewForm.rating" :size="28" />
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="review-comment">Votre commentaire</label>
+            <textarea
+              id="review-comment"
+              v-model="reviewForm.comment"
+              class="form-input"
+              rows="3"
+              maxlength="1000"
+              placeholder="Qu'avez-vous pensé de ce livre ?"
+            />
+          </div>
+          <StatusMessage v-if="reviewError" :message="reviewError" />
+          <button type="submit" class="button button--primary book-detail-view__review-submit" :disabled="isPostingReview">
+            {{ isPostingReview ? 'Envoi…' : 'Publier mon avis' }}
+          </button>
+        </form>
+        <p v-else class="book-detail-view__muted">
+          <RouterLink :to="{ name: 'login', query: { redirect: route.fullPath } }">Connectez-vous</RouterLink> pour donner votre avis.
+        </p>
+
+        <p v-if="sortedReviews.length === 0" class="book-detail-view__muted">Aucun avis pour le moment.</p>
+        <ul v-else class="book-detail-view__review-list">
+          <li v-for="review in sortedReviews" :key="review.id" class="book-detail-view__review">
+            <div class="book-detail-view__review-header">
+              <strong>{{ reviewerNames[review.userId] ?? '…' }}</strong>
+              <StarRating :model-value="review.rating" readonly :size="16" />
+              <span class="book-detail-view__review-date">{{ formatDate(review.createdAt) }}</span>
+            </div>
+            <p v-if="review.comment">{{ review.comment }}</p>
+          </li>
+        </ul>
+      </section>
+    </template>
+  </div>
+</template>
+
+<style scoped>
+.book-detail-view__back-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-on-dark);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.book-detail-view__back-link:hover {
+  text-decoration: underline;
+}
+
+.book-detail-view__summary {
+  display: flex;
+  gap: 32px;
+  padding: 32px;
+}
+
+.book-detail-view__information {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.book-detail-view__type {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-primary);
+}
+
+.book-detail-view__title {
+  font-size: 2rem;
+  line-height: 1.15;
+}
+
+.book-detail-view__authors {
+  font-size: 1.1rem;
+  color: var(--color-text-muted);
+}
+
+.book-detail-view__rating,
+.book-detail-view__genres,
+.book-detail-view__stock,
+.book-detail-view__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.book-detail-view__rating span {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.book-detail-view__reviews {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 28px 32px;
+}
+
+.book-detail-view__section-title {
+  font-size: 1.3rem;
+}
+
+.book-detail-view__review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-surface-border);
+}
+
+.book-detail-view__review-submit {
+  align-self: flex-start;
+}
+
+.book-detail-view__muted {
+  color: var(--color-text-muted);
+}
+
+.book-detail-view__review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.book-detail-view__review {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: var(--radius-small);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.book-detail-view__review-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.book-detail-view__review-date {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 700px) {
+  .book-detail-view__summary {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .book-detail-view__title {
+    font-size: 1.5rem;
+  }
+
+  .book-detail-view__reviews {
+    padding: 20px;
+  }
+}
+</style>

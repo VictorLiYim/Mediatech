@@ -1,39 +1,27 @@
 import { fileURLToPath, URL } from 'node:url'
-
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
 
-// https://vite.dev/config/
+const services = {
+  '/api/users': 'http://localhost:8083',
+  '/api/books': 'http://localhost:8081',
+  '/api/authors': 'http://localhost:8081',
+  '/api/events': 'http://localhost:8082',
+}
+
+const proxy = Object.fromEntries(
+  Object.entries(services).map(([prefix, target]) => [
+    prefix,
+    { target, changeOrigin: true, rewrite: (path) => path.replace(/^\/api/, '') },
+  ]),
+)
+
 export default defineConfig({
-  plugins: [
-    vue(),
-    vueDevTools(),
-  ],
+  plugins: [vue()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  server: {
-    // Reproduit en dev ce que fait le reverse proxy httpd en Docker : /api/<service>/*
-    // est renvoyé vers le port local du service, en retirant le préfixe /api.
-    proxy: {
-      '/api/users': {
-        target: 'http://localhost:8083',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-      '/api/books': {
-        target: 'http://localhost:8081',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-      '/api/events': {
-        target: 'http://localhost:8082',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-      },
-    },
-  },
+  server: { proxy },
 })

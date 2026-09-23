@@ -18,7 +18,8 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({EventNotFoundException.class, AuthorNotFoundException.class, UserNotFoundException.class})
+    @ExceptionHandler({EventNotFoundException.class, AuthorNotFoundException.class, UserNotFoundException.class,
+            RegistrationNotFoundException.class})
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiError handleNotFound(RuntimeException ex) {
         log.warn("404 Not Found: {}", ex.getMessage());

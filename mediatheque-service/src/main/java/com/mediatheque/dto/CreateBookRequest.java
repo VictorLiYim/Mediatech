@@ -17,4 +17,5 @@ public record CreateBookRequest(
         @NotNull BookType type,
         String description,
         Set<Genre> genres,
-        @Min(1) int totalCopies) {}
+        @Min(1) int totalCopies,
+        @NotNull Long userId) {}

@@ -16,4 +16,5 @@ message UserRequest {
 message UserReply {
   bool exists = 1;
   string userName = 2;
+  bool isAdmin = 3;
 }

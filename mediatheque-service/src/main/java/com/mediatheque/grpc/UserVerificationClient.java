@@ -4,4 +4,6 @@ package com.mediatheque.grpc;
 public interface UserVerificationClient {
 
     boolean userExists(Long userId);
+
+    boolean isAdmin(Long userId);
 }

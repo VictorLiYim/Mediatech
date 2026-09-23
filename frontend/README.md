@@ -1,38 +1,75 @@
-# frontend
+# Médiatech — frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Application Vue.js de la médiathèque : recherche de livres via une API externe, bibliothèque personnelle
+(lu / non lu, favoris), catalogue et emprunts de la médiathèque, événements.
 
-## Recommended IDE Setup
+## Stack
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Vue 3** (`<script setup>`) + **Vite**
+- **Vue Router** : pages et gardes de navigation (connexion, rôle admin)
+- **Vuex 4** : modules `auth`, `catalog`, `library` (state, getters, mutations, actions)
+- **localStorage** : session et bibliothèque personnelle (une par utilisateur)
+- **axios** : appels au back et à Open Library
+- CSS écrit à la main (`<style scoped>` + `src/assets/styles/`), sans framework UI
 
-## Recommended Browser Setup
+## API externe : Open Library
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+Documentation : https://openlibrary.org/developers/api (gratuite, sans clé).
 
-## Customize configuration
+| Usage | Endpoint |
+|---|---|
+| Recherche (titre, auteur, année, couverture, ISBN) | `GET https://openlibrary.org/search.json?q=…` |
+| Résumé d'une œuvre | `GET https://openlibrary.org/works/{id}.json` |
+| Couverture | `https://covers.openlibrary.org/b/id/{coverId}-M.jpg` ou `/b/isbn/{isbn}-M.jpg` |
+| Année d'un livre du stock | `GET https://openlibrary.org/search.json?isbn=…` |
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Un résultat de recherche est rapproché du stock de la médiathèque par son ISBN : s'il est en stock, il
+peut être emprunté.
 
-## Project Setup
+## Installation
 
-```sh
+Prérequis : Node.js 22.18+ (ou 24.12+), et les 3 services Spring Boot lancés (voir le README racine).
+
+```bash
+cd frontend
 npm install
+npm run dev        # http://localhost:5173
 ```
 
-### Compile and Hot-Reload for Development
+En dev, Vite redirige `/api/users`, `/api/books`, `/api/authors` et `/api/events` vers les services locaux
+(8083, 8081, 8082), comme le fait httpd en Docker.
 
-```sh
-npm run dev
+`npm run build` produit la version de production dans `dist/`.
+
+## Comptes
+
+- Admin de démo : `admin` / `admin1234` (créé par `user-service/src/main/resources/data.sql`).
+  Il peut ajouter des livres au stock (page **Stock** ou bouton « Ajouter au stock » dans la recherche).
+- Les autres comptes se créent depuis la page d'inscription.
+
+## Pages
+
+| Route | Contenu |
+|---|---|
+| `/` | Accueil : recherche, nouveautés, prochains événements, prochains rendus |
+| `/search` | Recherche Open Library → sélection d'un résultat → ajout à la bibliothèque |
+| `/catalog`, `/catalog/:id` | Stock de la médiathèque, détail, emprunt, avis |
+| `/library` | Bibliothèque personnelle : lu / non lu, favoris, suppression |
+| `/favorites` | Favoris uniquement (getter Vuex `library/favoriteItems`) |
+| `/loans` | Emprunts en cours et historique |
+| `/events` | Événements, inscription / désinscription |
+| `/profile` | Profil et statistiques |
+| `/admin/stock` | Gestion du stock (admin) |
+
+## Structure
+
 ```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
+src/
+├── api/          # clients HTTP : back (usersApi, booksApi, authorsApi, eventsApi) et openLibraryApi
+├── assets/styles # variables, styles de base, styles partagés
+├── components/   # composants réutilisables (cartes, couverture, notation, modale…)
+├── router/       # routes + gardes
+├── store/        # Vuex : modules auth, catalog, library + plugin de persistance localStorage
+├── utils/        # formatage des dates, libellés, ISBN, accès localStorage
+└── views/        # une vue par page
 ```

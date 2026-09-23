@@ -7,13 +7,13 @@ BASE_URL="http://localhost:8081"
 echo "1) Création d'un auteur"
 AUTHOR_ID=$(curl -s -X POST "$BASE_URL/authors" \
   -H "Content-Type: application/json" \
-  -d '{"name": "Victor Hugo", "bio": "Écrivain français du XIXe siècle"}' | tee /dev/stderr | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+  -d '{"name": "Victor Hugo", "bio": "Écrivain français du XIXe siècle", "userId": 1}' | tee /dev/stderr | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
 echo -e "\n-> author id = $AUTHOR_ID\n"
 
 echo "2) Création d'un livre avec 3 exemplaires"
 BOOK_ID=$(curl -s -X POST "$BASE_URL/books" \
   -H "Content-Type: application/json" \
-  -d "{\"title\": \"Les Misérables\", \"authorIds\": [$AUTHOR_ID], \"isbn\": \"978-2-07-040969-3\", \"type\": \"ROMAN\", \"description\": \"Une fresque sociale\", \"genres\": [\"CLASSIQUE\", \"HISTORIQUE\"], \"totalCopies\": 3}" | tee /dev/stderr | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
+  -d "{\"title\": \"Les Misérables\", \"authorIds\": [$AUTHOR_ID], \"isbn\": \"978-2-07-040969-3\", \"type\": \"ROMAN\", \"description\": \"Une fresque sociale\", \"genres\": [\"CLASSIQUE\", \"HISTORIQUE\"], \"totalCopies\": 3, \"userId\": 1}" | tee /dev/stderr | grep -o '"id":[0-9]*' | head -1 | grep -o '[0-9]*')
 echo -e "\n-> book id = $BOOK_ID\n"
 
 echo "3) Vérification du catalogue (GET /books)"

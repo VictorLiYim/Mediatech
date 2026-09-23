@@ -1,9 +1,11 @@
 package com.mediatheque.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record CreateAuthorRequest(
         @NotBlank String name,
-        String bio
+        String bio,
+        @NotNull Long userId
 ) {
 }

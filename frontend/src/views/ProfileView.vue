@@ -1,97 +1,128 @@
-<template>
-  <v-container class="mt-6 mb-10" style="max-width: 560px">
-    <h1 class="text-title on-bg mb-6">Mon profil</h1>
-
-    <article class="glass pa-6 text-center mb-4">
-      <div class="avatar mx-auto mb-4">{{ initials }}</div>
-      <p class="text-subtitle mb-1">{{ userStore.currentUser?.userName }}</p>
-      <p class="text-caption-brand">{{ userStore.currentUser?.email }}</p>
-    </article>
-
-    <div class="d-flex ga-3 mb-4">
-      <RouterLink :to="{ name: 'loans' }" class="glass glass--tight stat-card">
-        <p class="stat-card__value">{{ loading ? "…" : activeLoanCount }}</p>
-        <p class="text-caption-brand">Emprunt(s) en cours</p>
-      </RouterLink>
-      <RouterLink :to="{ name: 'events' }" class="glass glass--tight stat-card">
-        <p class="stat-card__value">{{ loading ? "…" : registrationCount }}</p>
-        <p class="text-caption-brand">Événement(s) suivi(s)</p>
-      </RouterLink>
-    </div>
-
-    <article class="glass pa-4">
-      <v-btn class="btn-pill btn-pill--secondary" variant="flat" block prepend-icon="mdi-logout" @click="handleLogout">
-        Déconnexion
-      </v-btn>
-    </article>
-  </v-container>
-</template>
-
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { useUserStore } from "@/stores/user";
-import { getLoansForUser } from "@/api/books";
-import { getRegistrationsForUser } from "@/api/events";
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import { mdiAccountCircle } from '@mdi/js'
+import { fetchUser } from '@/api/usersApi'
+import AppIcon from '@/components/AppIcon.vue'
 
-const userStore = useUserStore();
-const router = useRouter();
+const store = useStore()
+const router = useRouter()
 
-const loading = ref(true);
-const activeLoanCount = ref(0);
-const registrationCount = ref(0);
+const profile = ref(null)
+const isAdmin = computed(() => store.getters['auth/isAdmin'])
 
-const initials = computed(() => {
-  const name = userStore.currentUser?.userName ?? "";
-  return name.slice(0, 2).toUpperCase();
-});
+const statistics = computed(() => [
+  { label: 'Livres dans ma bibliothèque', value: store.getters['library/itemCount'], to: { name: 'library' } },
+  { label: 'Livres lus', value: store.getters['library/readItems'].length, to: { name: 'library' } },
+  { label: 'Favoris', value: store.getters['library/favoriteItems'].length, to: { name: 'favorites' } },
+])
 
-function handleLogout() {
-  userStore.logout();
-  router.push({ name: "login" });
+function logout() {
+  store.dispatch('auth/logout')
+  router.push({ name: 'home' })
 }
 
 onMounted(async () => {
   try {
-    const [loans, registrations] = await Promise.all([
-      getLoansForUser(userStore.currentUser.id),
-      getRegistrationsForUser(userStore.currentUser.id),
-    ]);
-    activeLoanCount.value = loans.filter((loan) => !loan.returnDate).length;
-    registrationCount.value = registrations.length;
+    profile.value = await fetchUser(store.getters['auth/currentUserId'])
   } catch {
-    // Les compteurs restent à 0 si l'appel échoue — non bloquant pour la page profil.
-  } finally {
-    loading.value = false;
+    profile.value = null
   }
-});
+})
 </script>
 
+<template>
+  <div class="page-container profile-view">
+    <section class="profile-view__card glass-panel">
+      <AppIcon :path="mdiAccountCircle" :size="88" class="profile-view__avatar" />
+      <h1 class="profile-view__name">{{ store.getters['auth/userName'] }}</h1>
+      <p v-if="profile" class="profile-view__email">{{ profile.email }}</p>
+      <span class="badge" :class="{ 'badge--warning': isAdmin }">{{ isAdmin ? 'Administrateur' : 'Lecteur' }}</span>
+
+      <div class="profile-view__statistics">
+        <RouterLink v-for="statistic in statistics" :key="statistic.label" :to="statistic.to" class="profile-view__statistic">
+          <strong class="profile-view__statistic-value">{{ statistic.value }}</strong>
+          <span class="profile-view__statistic-label">{{ statistic.label }}</span>
+        </RouterLink>
+      </div>
+
+      <div class="profile-view__actions">
+        <RouterLink v-if="isAdmin" :to="{ name: 'admin-stock' }" class="button button--secondary">Gérer le stock</RouterLink>
+        <button type="button" class="button button--danger" @click="logout">Se déconnecter</button>
+      </div>
+    </section>
+  </div>
+</template>
+
 <style scoped>
-.avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background: linear-gradient(160deg, var(--color-lavender-bright), var(--color-lavender));
-  color: white;
+.profile-view__card {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.5rem;
-}
-
-.stat-card {
-  flex: 1;
-  padding: 20px;
+  gap: 8px;
+  padding: 40px 24px;
   text-align: center;
-  text-decoration: none;
-  color: inherit;
 }
 
-.stat-card__value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--color-lavender);
+.profile-view__avatar {
+  color: var(--color-primary);
+}
+
+.profile-view__name {
+  font-size: 1.6rem;
+}
+
+.profile-view__email {
+  color: var(--color-text-muted);
+}
+
+.profile-view__statistics {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.profile-view__statistic {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 8px;
+  border-radius: var(--radius-medium);
+  background: rgba(255, 255, 255, 0.45);
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+
+.profile-view__statistic:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.profile-view__statistic-value {
+  font-size: 1.8rem;
+  color: var(--color-primary);
+}
+
+.profile-view__statistic-label {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.profile-view__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+@media (max-width: 480px) {
+  .profile-view__statistics {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

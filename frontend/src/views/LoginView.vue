@@ -1,82 +1,67 @@
-<template>
-  <div class="auth-hero">
-    <article class="glass pa-6" style="width: 420px; max-width: 100%">
-      <p class="text-subtitle mb-4">Connexion</p>
-
-      <v-alert v-if="errorMessage" type="error" density="compact" class="mb-4">
-        {{ errorMessage }}
-      </v-alert>
-
-      <v-text-field
-          v-model="userName"
-          label="Nom d'utilisateur"
-          variant="outlined"
-          density="comfortable"
-          @keyup.enter="handleLogin"
-      />
-
-      <v-text-field
-          v-model="password"
-          label="Mot de passe"
-          type="password"
-          variant="outlined"
-          density="comfortable"
-          @keyup.enter="handleLogin"
-      />
-
-      <v-btn
-          variant="flat"
-          block
-          size="large"
-          :loading="loading"
-          class="btn-pill mt-2"
-          @click="handleLogin"
-      >
-        Se connecter
-      </v-btn>
-
-      <div class="text-center mt-4">
-        Pas encore de compte ?
-        <RouterLink to="/register">Créer un compte</RouterLink>
-      </div>
-    </article>
-  </div>
-</template>
-
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-import { useUserStore } from "@/stores/user";
-import { extractErrorMessage } from "@/api/client";
+import { reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
+import { extractErrorMessage } from '@/api/client'
+import StatusMessage from '@/components/StatusMessage.vue'
 
-const userName = ref("");
-const password = ref("");
-const errorMessage = ref("");
-const loading = ref(false);
+const store = useStore()
+const route = useRoute()
+const router = useRouter()
 
-const userStore = useUserStore();
-const router = useRouter();
+const credentials = reactive({ userName: '', password: '' })
+const errorMessage = ref('')
+const isSubmitting = ref(false)
 
-async function handleLogin() {
-  errorMessage.value = "";
-  loading.value = true;
+async function submitLogin() {
+  errorMessage.value = ''
+  isSubmitting.value = true
   try {
-    await userStore.login({ userName: userName.value, password: password.value });
-    router.push({ name: "home" });
+    await store.dispatch('auth/login', { ...credentials })
+    router.replace(route.query.redirect ?? { name: 'home' })
   } catch (error) {
-    errorMessage.value = extractErrorMessage(error, "Identifiants invalides");
+    errorMessage.value = error.response?.status === 401
+      ? "Nom d'utilisateur ou mot de passe incorrect."
+      : extractErrorMessage(error, 'Connexion impossible')
   } finally {
-    loading.value = false;
+    isSubmitting.value = false
   }
 }
 </script>
 
-<style scoped>
-.auth-hero {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-</style>
+<template>
+  <div class="page-container auth-page">
+    <form class="auth-page__card glass-panel" @submit.prevent="submitLogin">
+      <h1 class="auth-page__title">Connexion</h1>
+      <p class="auth-page__subtitle">Retrouvez votre bibliothèque, vos favoris et vos emprunts.</p>
+
+      <div class="form-field">
+        <label class="form-label" for="login-user-name">Nom d'utilisateur</label>
+        <input id="login-user-name" v-model="credentials.userName" class="form-input" autocomplete="username" required>
+      </div>
+      <div class="form-field">
+        <label class="form-label" for="login-password">Mot de passe</label>
+        <input
+          id="login-password"
+          v-model="credentials.password"
+          class="form-input"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <StatusMessage v-if="errorMessage" :message="errorMessage" />
+
+      <button type="submit" class="button button--primary auth-page__submit" :disabled="isSubmitting">
+        {{ isSubmitting ? 'Connexion…' : 'Se connecter' }}
+      </button>
+      <p class="auth-page__switch">
+        Pas encore de compte ?
+        <RouterLink :to="{ name: 'register', query: route.query }">Créer un compte</RouterLink>
+      </p>
+    </form>
+  </div>
+</template>
+
+<style scoped src="@/assets/styles/auth-page.css"></style>

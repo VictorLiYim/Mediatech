@@ -17,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.mediatheque.dto.BookResponse;
 import com.mediatheque.dto.CreateBookRequest;
 import com.mediatheque.models.Book;
+import com.mediatheque.services.AdminAccessService;
 import com.mediatheque.services.BookService;
 
 import jakarta.validation.Valid;
@@ -28,14 +29,17 @@ public class BookController {
     private static final Logger log = LoggerFactory.getLogger(BookController.class);
 
     private final BookService bookService;
+    private final AdminAccessService adminAccessService;
 
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService, AdminAccessService adminAccessService) {
         this.bookService = bookService;
+        this.adminAccessService = adminAccessService;
     }
 
     @PostMapping
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody CreateBookRequest request) {
         log.info("POST /books isbn={}", request.isbn());
+        adminAccessService.requireAdmin(request.userId());
         Book book = bookService.createBook(
                 request.title(), request.authorIds(), request.isbn(), request.type(),
                 request.description(), request.genres(), request.totalCopies()

@@ -33,6 +33,7 @@ public class UserInfoServiceImpl extends UserInfoServiceGrpc.UserInfoServiceImpl
 				reply = UserReply.newBuilder()
 						.setExists(true)
 						.setUserName(user.getUserName())
+						.setIsAdmin(user.isAdmin())
 						.build();
 			} else {
 				reply = UserReply.newBuilder().setExists(false).build();

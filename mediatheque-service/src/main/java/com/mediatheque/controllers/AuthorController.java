@@ -17,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.mediatheque.dto.AuthorResponse;
 import com.mediatheque.dto.CreateAuthorRequest;
 import com.mediatheque.models.Author;
+import com.mediatheque.services.AdminAccessService;
 import com.mediatheque.services.AuthorService;
 
 import jakarta.validation.Valid;
@@ -28,14 +29,17 @@ public class AuthorController {
     private static final Logger log = LoggerFactory.getLogger(AuthorController.class);
 
     private final AuthorService authorService;
+    private final AdminAccessService adminAccessService;
 
-    public AuthorController(AuthorService authorService) {
+    public AuthorController(AuthorService authorService, AdminAccessService adminAccessService) {
         this.authorService = authorService;
+        this.adminAccessService = adminAccessService;
     }
 
     @PostMapping
     public ResponseEntity<AuthorResponse> createAuthor(@Valid @RequestBody CreateAuthorRequest request) {
         log.info("POST /authors name={}", request.name());
+        adminAccessService.requireAdmin(request.userId());
         Author author = authorService.createAuthor(request.name(), request.bio());
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}").buildAndExpand(author.getId()).toUri();

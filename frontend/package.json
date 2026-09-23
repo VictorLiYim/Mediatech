@@ -1,6 +1,6 @@
 {
-  "name": "frontend",
-  "version": "0.0.0",
+  "name": "mediatech-frontend",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,17 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mdi/font": "^7.4.47",
+    "@mdi/js": "^7.4.47",
     "axios": "^1.20.0",
-    "pinia": "^4.0.2",
-    "vue": "^3.5.40",
-    "vue-router": "^5.2.0",
-    "vuetify": "^4.2.0"
+    "vue": "^3.5.43",
+    "vue-router": "^5.3.1",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.8",
-    "vite": "^8.1.5",
-    "vite-plugin-vue-devtools": "^8.1.5"
+    "@vitejs/plugin-vue": "^6.0.9",
+    "vite": "^8.3.0"
   },
   "engines": {
     "node": "^22.18.0 || >=24.12.0"

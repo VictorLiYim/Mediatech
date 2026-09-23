@@ -3,6 +3,11 @@ spring:
     name: user-service
   profiles:
     active: dev
+  jpa:
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
   grpc:
     server:
       port: 9091

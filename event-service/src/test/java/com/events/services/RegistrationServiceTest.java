@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.events.exceptions.AlreadyRegisteredException;
 import com.events.exceptions.EventFullException;
+import com.events.exceptions.RegistrationNotFoundException;
 import com.events.exceptions.UserNotFoundException;
 import com.events.grpc.UserVerificationClient;
 import com.events.models.Event;
@@ -87,6 +89,24 @@ class RegistrationServiceTest {
 
         assertThatThrownBy(() -> registrationService.register(1L, 42L))
                 .isInstanceOf(EventFullException.class);
+    }
+
+    @Test
+    void unregister_whenRegistered_deletesRegistration() {
+        Registration registration = new Registration(1L, 42L);
+        when(registrationRepository.findByEventIdAndUserId(1L, 42L)).thenReturn(Optional.of(registration));
+
+        registrationService.unregister(1L, 42L);
+
+        verify(registrationRepository).delete(registration);
+    }
+
+    @Test
+    void unregister_whenNotRegistered_throwsRegistrationNotFound() {
+        when(registrationRepository.findByEventIdAndUserId(1L, 42L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> registrationService.unregister(1L, 42L))
+                .isInstanceOf(RegistrationNotFoundException.class);
     }
 
     @Test

@@ -25,6 +25,13 @@ public class GlobalExceptionHandler {
         return ApiError.of(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(AdminRightsRequiredException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleForbidden(AdminRightsRequiredException ex) {
+        log.warn("403 Forbidden: {}", ex.getMessage());
+        return ApiError.of(HttpStatus.FORBIDDEN, ex.getMessage());
+    }
+
     @ExceptionHandler({
             BookAlreadyExistsException.class,
             BookNotAvailableException.class,

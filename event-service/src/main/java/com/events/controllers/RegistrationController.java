@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +36,13 @@ public class RegistrationController {
     public RegistrationResponse register(@PathVariable Long id, @Valid @RequestBody RegisterRequest request) {
         log.info("POST /events/{}/register userId={}", id, request.userId());
         return RegistrationResponse.from(registrationService.register(id, request.userId()));
+    }
+
+    @DeleteMapping("/{id}/register")
+    public ResponseEntity<Void> unregister(@PathVariable Long id, @RequestParam Long userId) {
+        log.info("DELETE /events/{}/register userId={}", id, userId);
+        registrationService.unregister(id, userId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/registrations")

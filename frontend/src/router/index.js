@@ -1,37 +1,92 @@
-import { createRouter, createWebHistory } from "vue-router";
-import { useUserStore } from "@/stores/user";
+import { createRouter, createWebHistory } from 'vue-router'
+import store from '@/store'
+import HomeView from '@/views/HomeView.vue'
 
-import LoginView from "@/views/LoginView.vue";
-import RegisterView from "@/views/RegisterView.vue";
-import HomeView from "@/views/HomeView.vue";
-import BookListView from "@/views/BookListView.vue";
-import BookDetailView from "@/views/BookDetailView.vue";
-import MyLoansView from "@/views/MyLoansView.vue";
-import EventListView from "@/views/EventListView.vue";
-import ProfileView from "@/views/ProfileView.vue";
+const routes = [
+  { path: '/', name: 'home', component: HomeView, meta: { title: 'Accueil' } },
+  { path: '/search', name: 'search', component: () => import('@/views/SearchView.vue'), meta: { title: 'Rechercher' } },
+  { path: '/catalog', name: 'catalog', component: () => import('@/views/CatalogView.vue'), meta: { title: 'Catalogue' } },
+  {
+    path: '/catalog/:bookId',
+    name: 'book-detail',
+    component: () => import('@/views/BookDetailView.vue'),
+    props: true,
+    meta: { title: 'Livre' },
+  },
+  {
+    path: '/library',
+    name: 'library',
+    component: () => import('@/views/LibraryView.vue'),
+    meta: { title: 'Ma bibliothèque', requiresAuth: true },
+  },
+  {
+    path: '/favorites',
+    name: 'favorites',
+    component: () => import('@/views/FavoritesView.vue'),
+    meta: { title: 'Favoris', requiresAuth: true },
+  },
+  {
+    path: '/loans',
+    name: 'loans',
+    component: () => import('@/views/LoansView.vue'),
+    meta: { title: 'Mes emprunts', requiresAuth: true },
+  },
+  { path: '/events', name: 'events', component: () => import('@/views/EventsView.vue'), meta: { title: 'Événements' } },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/views/ProfileView.vue'),
+    meta: { title: 'Profil', requiresAuth: true },
+  },
+  {
+    path: '/admin/stock',
+    name: 'admin-stock',
+    component: () => import('@/views/AdminStockView.vue'),
+    meta: { title: 'Gestion du stock', requiresAuth: true, requiresAdmin: true },
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/LoginView.vue'),
+    meta: { title: 'Connexion', guestOnly: true },
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('@/views/RegisterView.vue'),
+    meta: { title: 'Inscription', guestOnly: true },
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('@/views/NotFoundView.vue'),
+    meta: { title: 'Page introuvable' },
+  },
+]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    { path: "/login", name: "login", component: LoginView },
-    { path: "/register", name: "register", component: RegisterView },
-    { path: "/", name: "home", component: HomeView, meta: { requiresAuth: true } },
-    { path: "/books", name: "books", component: BookListView, meta: { requiresAuth: true } },
-    { path: "/books/:id", name: "book-detail", component: BookDetailView, meta: { requiresAuth: true } },
-    { path: "/loans", name: "loans", component: MyLoansView, meta: { requiresAuth: true } },
-    { path: "/events", name: "events", component: EventListView, meta: { requiresAuth: true } },
-    { path: "/profile", name: "profile", component: ProfileView, meta: { requiresAuth: true } },
-  ],
-});
+  history: createWebHistory(),
+  routes,
+  scrollBehavior: () => ({ top: 0 }),
+})
 
 router.beforeEach((to) => {
-  const userStore = useUserStore();
-  if (to.meta.requiresAuth && !userStore.isLoggedIn) {
-    return { name: "login" };
-  }
-  if ((to.name === "login" || to.name === "register") && userStore.isLoggedIn) {
-    return { name: "home" };
-  }
-});
+  const isAuthenticated = store.getters['auth/isAuthenticated']
 
-export default router;
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    return { name: 'login', query: { redirect: to.fullPath } }
+  }
+  if (to.meta.requiresAdmin && !store.getters['auth/isAdmin']) {
+    return { name: 'home' }
+  }
+  if (to.meta.guestOnly && isAuthenticated) {
+    return { name: 'home' }
+  }
+  return true
+})
+
+router.afterEach((to) => {
+  document.title = to.meta.title ? `${to.meta.title} · Médiatech` : 'Médiatech'
+})
+
+export default router

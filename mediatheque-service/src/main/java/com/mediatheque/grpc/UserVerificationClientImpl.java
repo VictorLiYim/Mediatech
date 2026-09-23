@@ -24,4 +24,13 @@ public class UserVerificationClientImpl implements UserVerificationClient {
         log.debug("gRPC user-service getUser userId={} exists={}", userId, reply.getExists());
         return reply.getExists();
     }
+
+    @Override
+    public boolean isAdmin(Long userId) {
+        UserReply reply = stub.getUser(UserRequest.newBuilder()
+                .setUserId(String.valueOf(userId))
+                .build());
+        log.debug("gRPC user-service getUser userId={} isAdmin={}", userId, reply.getIsAdmin());
+        return reply.getExists() && reply.getIsAdmin();
+    }
 }

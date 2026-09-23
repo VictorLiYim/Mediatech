@@ -2,6 +2,7 @@ package com.events.services;
 
 import com.events.exceptions.AlreadyRegisteredException;
 import com.events.exceptions.EventFullException;
+import com.events.exceptions.RegistrationNotFoundException;
 import com.events.exceptions.UserNotFoundException;
 import com.events.grpc.UserVerificationClient;
 import com.events.models.Event;
@@ -50,6 +51,15 @@ public class RegistrationServiceImpl implements RegistrationService{
         Registration saved = registrationRepository.save(new Registration(eventId, userId));
         log.info("User {} registered to event {}", userId, eventId);
         return saved;
+    }
+
+    @Override
+    @Transactional
+    public void unregister(Long eventId, Long userId){
+        Registration registration = registrationRepository.findByEventIdAndUserId(eventId, userId)
+                .orElseThrow(() -> new RegistrationNotFoundException(eventId, userId));
+        registrationRepository.delete(registration);
+        log.info("User {} unregistered from event {}", userId, eventId);
     }
 
     @Override
