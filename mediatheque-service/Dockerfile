@@ -15,7 +15,7 @@ COPY event-service event-service
 RUN ./gradlew :mediatheque-service:bootJar --no-daemon
 
 # --- Étape 2 : exécution (JRE seul, image finale légère) ---
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /workspace/mediatheque-service/build/libs/*.jar app.jar
 

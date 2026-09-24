@@ -3,7 +3,7 @@ services:
     image: mariadb:11
     container_name: mediatheque-mariadb
     env_file:
-      - .env
+     - ../.env
     environment:
       MARIADB_DATABASE: ${MEDIATHEQUE_DB_NAME:-mediatheque_db}
       MARIADB_USER: ${DB_USER:-mediatheque}
@@ -40,7 +40,7 @@ services:
       dockerfile: user-service/Dockerfile
     container_name: mediatheque-user-service
     env_file:
-      - .env
+      - ../.env
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
@@ -55,7 +55,7 @@ services:
       dockerfile: mediatheque-service/Dockerfile
     container_name: mediatheque-mediatheque-service
     env_file:
-      - .env
+      - ../.env
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
@@ -72,7 +72,7 @@ services:
       dockerfile: event-service/Dockerfile
     container_name: mediatheque-event-service
     env_file:
-      - .env
+      - ../.env
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:

@@ -14,8 +14,8 @@ COPY event-service event-service
 
 RUN ./gradlew :user-service:bootJar --no-daemon
 
-# --- Étape 2 : exécution (JRE seul, image finale légère) ---
-FROM eclipse-temurin:17-jre-alpine
+# --- Étape 2 : exécution
+FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=build /workspace/user-service/build/libs/*.jar app.jar
 
