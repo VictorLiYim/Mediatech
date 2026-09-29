@@ -26,12 +26,12 @@ defineProps({
 }
 
 .status-message--error {
-  background: rgba(255, 235, 235, 0.9);
+  background: var(--color-status-error);
   color: var(--color-danger);
 }
 
 .status-message--success {
-  background: rgba(230, 250, 238, 0.9);
+  background: var(--color-status-success);
   color: var(--color-success);
 }
 </style>

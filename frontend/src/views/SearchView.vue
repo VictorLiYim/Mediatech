@@ -1,17 +1,14 @@
 <script setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { mdiBookSearchOutline, mdiEmoticonSadOutline } from '@mdi/js'
 import { extractErrorMessage } from '@/api/client'
 import { SEARCH_PAGE_SIZE, searchBooks } from '@/api/openLibraryApi'
-import AddToStockForm from '@/components/AddToStockForm.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import ModalDialog from '@/components/ModalDialog.vue'
 import SearchBar from '@/components/SearchBar.vue'
 import SearchResultCard from '@/components/SearchResultCard.vue'
-import SearchResultDetail from '@/components/SearchResultDetail.vue'
 import StatusMessage from '@/components/StatusMessage.vue'
 import { libraryItemFromSearchResult, libraryItemFromStockBook } from '@/utils/libraryItems'
 
@@ -26,10 +23,6 @@ const currentPage = ref(1)
 const isSearching = ref(false)
 const isLoadingMore = ref(false)
 const errorMessage = ref('')
-const selectedResult = ref(null)
-const bookToAddToStock = ref(null)
-const successMessage = ref('')
-const detailPanel = ref(null)
 
 const activeQuery = computed(() => route.query.q ?? '')
 const hasMoreResults = computed(() => results.value.length < totalResults.value)
@@ -38,10 +31,21 @@ function stockBookFor(result) {
   return store.getters['catalog/findStockBook'](result.allIsbns)
 }
 
-function isInLibrary(result) {
+function libraryItemFor(result) {
   const stockBook = stockBookFor(result)
-  const itemId = stockBook ? libraryItemFromStockBook(stockBook).id : libraryItemFromSearchResult(result).id
-  return store.getters['library/isInLibrary'](itemId)
+  return stockBook ? libraryItemFromStockBook({ ...stockBook, year: result.year }) : libraryItemFromSearchResult(result)
+}
+
+function isInLibrary(result) {
+  return store.getters['library/isInLibrary'](libraryItemFor(result).id)
+}
+
+function addToLibrary(result) {
+  if (!store.getters['auth/isAuthenticated']) {
+    router.push({ name: 'login', query: { redirect: route.fullPath } })
+    return
+  }
+  store.dispatch('library/addItem', libraryItemFor(result))
 }
 
 function submitSearch(query) {
@@ -49,7 +53,6 @@ function submitSearch(query) {
 }
 
 async function runSearch(query) {
-  selectedResult.value = null
   results.value = []
   totalResults.value = 0
   errorMessage.value = ''
@@ -80,20 +83,8 @@ async function loadMoreResults() {
   }
 }
 
-async function selectResult(result) {
-  selectedResult.value = result
-  await nextTick()
-  detailPanel.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
-
-function onBookAddedToStock(book) {
-  bookToAddToStock.value = null
-  successMessage.value = `« ${book.title} » a été ajouté au stock de la médiathèque.`
-}
-
 watch(activeQuery, (query) => {
   searchInput.value = query
-  successMessage.value = ''
   runSearch(query)
 })
 
@@ -118,16 +109,6 @@ onMounted(() => {
     </header>
 
     <StatusMessage v-if="errorMessage" :message="errorMessage" />
-    <StatusMessage v-if="successMessage" type="success" :message="successMessage" />
-
-    <div v-if="selectedResult" ref="detailPanel" class="search-view__detail">
-      <SearchResultDetail
-        :result="selectedResult"
-        :stock-book="stockBookFor(selectedResult)"
-        @close="selectedResult = null"
-        @add-to-stock="bookToAddToStock = $event"
-      />
-    </div>
 
     <LoadingSpinner v-if="isSearching" label="Recherche en cours…" />
 
@@ -150,8 +131,7 @@ onMounted(() => {
           :result="result"
           :is-in-stock="stockBookFor(result) !== null"
           :is-in-library="isInLibrary(result)"
-          :is-selected="selectedResult?.externalId === result.externalId"
-          @select="selectResult"
+          @add="addToLibrary"
         />
       </div>
 
@@ -170,12 +150,8 @@ onMounted(() => {
       v-else-if="!activeQuery"
       :icon-path="mdiBookSearchOutline"
       title="Que voulez-vous lire ?"
-      message="Tapez un titre (ex. « Dune ») ou un auteur, puis choisissez un livre pour l'ajouter à votre bibliothèque."
+      message="Tapez un titre (ex. « Dune ») ou un auteur. Cliquez sur un livre pour voir sa fiche, ou sur « + » pour l'ajouter à votre bibliothèque."
     />
-
-    <ModalDialog v-if="bookToAddToStock" title="Ajouter au stock de la médiathèque" @close="bookToAddToStock = null">
-      <AddToStockForm :initial-book="bookToAddToStock" @created="onBookAddedToStock" @cancel="bookToAddToStock = null" />
-    </ModalDialog>
   </div>
 </template>
 
@@ -190,10 +166,6 @@ onMounted(() => {
 
 .search-view__search-bar {
   margin-top: 16px;
-}
-
-.search-view__detail {
-  scroll-margin-top: calc(var(--header-height) + 16px);
 }
 
 .search-view__result-count {

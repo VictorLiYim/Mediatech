@@ -4,6 +4,8 @@ import { useStore } from 'vuex'
 import { mdiBookshelf, mdiFilterRemoveOutline } from '@mdi/js'
 import EmptyState from '@/components/EmptyState.vue'
 import LibraryItemCard from '@/components/LibraryItemCard.vue'
+import LibraryStatistics from '@/components/LibraryStatistics.vue'
+import { LIBRARY_SORT_OPTIONS } from '@/utils/labels'
 
 const store = useStore()
 
@@ -19,6 +21,11 @@ const textFilter = ref('')
 
 const totalCount = computed(() => store.getters['library/itemCount'])
 const readCount = computed(() => store.getters['library/readItems'].length)
+
+const sortKey = computed({
+  get: () => store.state.library.sortKey,
+  set: (value) => store.dispatch('library/setSortKey', value),
+})
 
 function countFor(filter) {
   return store.getters[filter.getter].length
@@ -54,6 +61,10 @@ const displayedItems = computed(() => {
     </EmptyState>
 
     <template v-else>
+      <section class="library-view__statistics glass-panel" aria-label="Statistiques">
+        <LibraryStatistics />
+      </section>
+
       <div class="library-view__toolbar">
         <div class="library-view__filter-tabs" role="tablist" aria-label="Filtrer par statut">
           <button
@@ -70,13 +81,20 @@ const displayedItems = computed(() => {
             <span class="library-view__filter-count">{{ countFor(filter) }}</span>
           </button>
         </div>
-        <input
-          v-model="textFilter"
-          class="form-input library-view__text-filter"
-          type="search"
-          placeholder="Filtrer par titre ou auteur"
-          aria-label="Filtrer par titre ou auteur"
-        >
+        <div class="library-view__search-tools">
+          <input
+            v-model="textFilter"
+            class="form-input library-view__text-filter"
+            type="search"
+            placeholder="Filtrer par titre ou auteur"
+            aria-label="Filtrer par titre ou auteur"
+          >
+          <select v-model="sortKey" class="form-input library-view__sort-select" aria-label="Trier par">
+            <option v-for="option in LIBRARY_SORT_OPTIONS" :key="option.value" :value="option.value">
+              Trier : {{ option.label }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <EmptyState
@@ -92,6 +110,10 @@ const displayedItems = computed(() => {
 </template>
 
 <style scoped>
+.library-view__statistics {
+  padding: 16px;
+}
+
 .library-view__toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -126,12 +148,12 @@ const displayedItems = computed(() => {
 }
 
 .library-view__filter-tab:hover {
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--color-tile-hover);
 }
 
 .library-view__filter-tab--active {
   background: var(--color-primary);
-  color: var(--color-text-on-dark);
+  color: var(--color-on-primary);
 }
 
 .library-view__filter-tab--active:hover {
@@ -143,13 +165,28 @@ const displayedItems = computed(() => {
   opacity: 0.8;
 }
 
-.library-view__text-filter {
-  max-width: 280px;
+.library-view__search-tools {
+  flex: 1 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
-@media (max-width: 600px) {
+.library-view__text-filter {
+  flex: 0 1 260px;
+  min-width: 160px;
+}
+
+.library-view__sort-select {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+/* Filtre + tri passent sous les onglets : le filtre prend la place restante */
+@media (max-width: 920px) {
   .library-view__text-filter {
-    max-width: none;
+    flex: 1 1 160px;
   }
 }
 </style>

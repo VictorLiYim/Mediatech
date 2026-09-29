@@ -91,7 +91,7 @@ textarea {
 
 .button--primary {
   background: var(--color-primary);
-  color: var(--color-text-on-dark);
+  color: var(--color-on-primary);
 }
 
 .button--primary:not(:disabled):hover {
@@ -105,7 +105,7 @@ textarea {
 }
 
 .button--secondary:not(:disabled):hover {
-  background: #fff;
+  background: var(--color-button-secondary-hover);
 }
 
 .button--danger {
@@ -114,7 +114,7 @@ textarea {
 }
 
 .button--danger:not(:disabled):hover {
-  background: rgba(179, 38, 30, 0.2);
+  background: var(--color-danger-hover);
 }
 
 .button--small {

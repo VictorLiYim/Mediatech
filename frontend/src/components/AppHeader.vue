@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { mdiAccountCircle, mdiBookshelf, mdiClose, mdiLogout, mdiMenu } from '@mdi/js'
 import AppIcon from './AppIcon.vue'
+import ThemeSwitch from './ThemeSwitch.vue'
 
 const store = useStore()
 const route = useRoute()
@@ -13,7 +14,6 @@ const isMenuOpen = ref(false)
 const isAuthenticated = computed(() => store.getters['auth/isAuthenticated'])
 const isAdmin = computed(() => store.getters['auth/isAdmin'])
 const userName = computed(() => store.getters['auth/userName'])
-const favoriteCount = computed(() => store.getters['library/favoriteItems'].length)
 
 const navigationLinks = computed(() => {
   const links = [
@@ -25,7 +25,6 @@ const navigationLinks = computed(() => {
   if (isAuthenticated.value) {
     links.push(
       { to: { name: 'library' }, label: 'Ma bibliothèque' },
-      { to: { name: 'favorites' }, label: 'Favoris', count: favoriteCount.value },
       { to: { name: 'loans' }, label: 'Mes emprunts' },
     )
   }
@@ -53,6 +52,8 @@ function logout() {
         <span>Médiatech</span>
       </RouterLink>
 
+      <ThemeSwitch class="app-header__theme-switch" />
+
       <button
         type="button"
         class="app-header__menu-toggle"
@@ -77,14 +78,13 @@ function logout() {
           :exact-active-class="link.to.name === 'home' ? 'app-header__link--active' : undefined"
         >
           {{ link.label }}
-          <span v-if="link.count" class="app-header__link-count">{{ link.count }}</span>
         </RouterLink>
 
         <div class="app-header__account">
           <template v-if="isAuthenticated">
             <RouterLink :to="{ name: 'profile' }" class="app-header__profile-link" active-class="app-header__link--active">
               <AppIcon :path="mdiAccountCircle" :size="22" />
-              <span>{{ userName }}</span>
+              <span class="app-header__profile-name">{{ userName }}</span>
             </RouterLink>
             <button type="button" class="app-header__logout-button" title="Se déconnecter" @click="logout">
               <AppIcon :path="mdiLogout" :size="20" label="Se déconnecter" />
@@ -110,14 +110,13 @@ function logout() {
   -webkit-backdrop-filter: var(--blur-glass);
 }
 
+/* Pleine largeur : logo collé à gauche, compte + thème collés à droite */
 .app-header__inner {
-  max-width: var(--page-max-width);
   min-height: var(--header-height);
-  margin: 0 auto;
-  padding: 0 16px;
+  padding: 0 24px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
 }
 
 .app-header__brand {
@@ -130,11 +129,16 @@ function logout() {
   text-decoration: none;
 }
 
+.app-header__theme-switch {
+  order: 1;
+  flex-shrink: 0;
+}
+
 .app-header__navigation {
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .app-header__link,
@@ -142,10 +146,10 @@ function logout() {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 14px;
+  padding: 8px 11px;
   border-radius: var(--radius-pill);
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   text-decoration: none;
   white-space: nowrap;
   transition: background var(--transition-fast);
@@ -157,20 +161,10 @@ function logout() {
 }
 
 .app-header__link--active {
-  background: rgba(79, 63, 143, 0.2);
+  background: var(--color-navigation-active);
   font-weight: 600;
 }
 
-.app-header__link-count {
-  min-width: 20px;
-  padding: 0 6px;
-  border-radius: var(--radius-pill);
-  background: var(--color-favorite);
-  color: #fff;
-  font-size: 0.72rem;
-  line-height: 20px;
-  text-align: center;
-}
 
 .app-header__account {
   margin-left: auto;
@@ -200,9 +194,37 @@ function logout() {
   margin-left: auto;
 }
 
+/* Écrans moyens : on garde tous les liens sur une ligne */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  .app-header__inner {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .app-header__link,
+  .app-header__profile-link {
+    padding: 8px 8px;
+  }
+
+  .app-header__profile-name,
+  .app-header__theme-switch :deep(.theme-switch__icon) {
+    display: none;
+  }
+}
+
 @media (max-width: 1024px) {
+  .app-header__inner {
+    padding: 0 16px;
+  }
+
   .app-header__menu-toggle {
     display: inline-flex;
+    order: 2;
+    margin-left: 0;
+  }
+
+  .app-header__theme-switch {
+    margin-left: auto;
   }
 
   .app-header__navigation {

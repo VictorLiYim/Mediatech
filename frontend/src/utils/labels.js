@@ -25,3 +25,11 @@ export const EVENT_TYPE_LABELS = {
   FILM_PROJECTION: 'Projection',
   LECTURE: 'Lecture',
 }
+
+export const LIBRARY_SORT_OPTIONS = [
+  { value: 'addedAt', label: "Date d'ajout (récent)" },
+  { value: 'title', label: 'Titre (A → Z)' },
+  { value: 'yearDesc', label: 'Année (récent)' },
+  { value: 'yearAsc', label: 'Année (ancien)' },
+  { value: 'rating', label: 'Ma note' },
+]

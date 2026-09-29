@@ -7,8 +7,8 @@ Application Vue.js de la médiathèque : recherche de livres via une API externe
 
 - **Vue 3** (`<script setup>`) + **Vite**
 - **Vue Router** : pages et gardes de navigation (connexion, rôle admin)
-- **Vuex 4** : modules `auth`, `catalog`, `library` (state, getters, mutations, actions)
-- **localStorage** : session et bibliothèque personnelle (une par utilisateur)
+- **Vuex 4** : modules `auth`, `catalog`, `library`, `notifications` (toasts), `theme` (clair / sombre) — state, getters, mutations, actions
+- **localStorage** : session, bibliothèque personnelle et tri (par utilisateur), thème
 - **axios** : appels au back et à Open Library
 - CSS écrit à la main (`<style scoped>` + `src/assets/styles/`), sans framework UI
 
@@ -52,9 +52,10 @@ En dev, Vite redirige `/api/users`, `/api/books`, `/api/authors` et `/api/events
 | Route | Contenu |
 |---|---|
 | `/` | Accueil : recherche, nouveautés, prochains événements, prochains rendus |
-| `/search` | Recherche Open Library → sélection d'un résultat → ajout à la bibliothèque |
-| `/catalog`, `/catalog/:id` | Stock de la médiathèque, détail, emprunt, avis |
-| `/library` | Bibliothèque personnelle : lu / non lu, favoris, suppression |
+| `/search` | Recherche Open Library → ajout direct (« + ») ou ouverture de la fiche |
+| `/book/:workId` | Fiche d'un livre Open Library (résumé, sujets, stock) + bloc « Ma bibliothèque » |
+| `/catalog`, `/catalog/:id` | Stock de la médiathèque, détail, emprunt, avis, bloc « Ma bibliothèque » |
+| `/library` | Bibliothèque personnelle : lu / non lu, favoris, note perso (1 à 5), tri, suppression |
 | `/favorites` | Favoris uniquement (getter Vuex `library/favoriteItems`) |
 | `/loans` | Emprunts en cours et historique |
 | `/events` | Événements, inscription / désinscription |
@@ -69,7 +70,7 @@ src/
 ├── assets/styles # variables, styles de base, styles partagés
 ├── components/   # composants réutilisables (cartes, couverture, notation, modale…)
 ├── router/       # routes + gardes
-├── store/        # Vuex : modules auth, catalog, library + plugin de persistance localStorage
+├── store/        # Vuex : modules auth, catalog, library, notifications, theme + plugins de persistance localStorage
 ├── utils/        # formatage des dates, libellés, ISBN, accès localStorage
 └── views/        # une vue par page
 ```

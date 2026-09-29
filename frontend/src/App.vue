@@ -1,5 +1,6 @@
 <script setup>
 import AppHeader from '@/components/AppHeader.vue'
+import ToastContainer from '@/components/ToastContainer.vue'
 </script>
 
 <template>
@@ -7,6 +8,7 @@ import AppHeader from '@/components/AppHeader.vue'
   <main class="app-main">
     <RouterView />
   </main>
+  <ToastContainer />
 </template>
 
 <style scoped>

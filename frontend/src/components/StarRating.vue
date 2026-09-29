@@ -8,6 +8,8 @@ const rating = defineModel({ type: Number, default: 0 })
 const props = defineProps({
   readonly: { type: Boolean, default: false },
   size: { type: Number, default: 20 },
+  // Re-cliquer sur la note actuelle la retire
+  clearable: { type: Boolean, default: false },
 })
 
 const hoveredValue = ref(0)
@@ -17,6 +19,15 @@ function iconFor(position) {
   if (displayedValue.value >= position) return mdiStar
   if (props.readonly && displayedValue.value >= position - 0.5) return mdiStarHalfFull
   return mdiStarOutline
+}
+
+function select(position) {
+  if (props.clearable && rating.value === position) {
+    rating.value = 0
+    hoveredValue.value = 0
+  } else {
+    rating.value = position
+  }
 }
 </script>
 
@@ -41,7 +52,7 @@ function iconFor(position) {
         :aria-checked="rating === position"
         :aria-label="`${position} sur 5`"
         @mouseenter="hoveredValue = position"
-        @click="rating = position"
+        @click="select(position)"
       >
         <AppIcon :path="iconFor(position)" :size="size" class="star-rating__star" />
       </button>

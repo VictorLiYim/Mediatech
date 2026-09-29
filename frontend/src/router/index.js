@@ -14,6 +14,13 @@ const routes = [
     meta: { title: 'Livre' },
   },
   {
+    path: '/book/:workId',
+    name: 'open-library-book',
+    component: () => import('@/views/OpenLibraryBookView.vue'),
+    props: true,
+    meta: { title: 'Livre' },
+  },
+  {
     path: '/library',
     name: 'library',
     component: () => import('@/views/LibraryView.vue'),

@@ -9,6 +9,7 @@ import { coverUrlFromIsbn, fetchFirstPublishYearByIsbn } from '@/api/openLibrary
 import { fetchUser } from '@/api/usersApi'
 import AppIcon from '@/components/AppIcon.vue'
 import BookCover from '@/components/BookCover.vue'
+import LibraryItemPanel from '@/components/LibraryItemPanel.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import StarRating from '@/components/StarRating.vue'
 import StatusMessage from '@/components/StatusMessage.vue'
@@ -43,6 +44,7 @@ const currentUserId = computed(() => store.getters['auth/currentUserId'])
 const authorNames = computed(() => book.value?.authors.map((author) => author.name).join(', ') ?? '')
 const libraryItem = computed(() => (book.value ? libraryItemFromStockBook({ ...book.value, year: publishYear.value }) : null))
 const isInLibrary = computed(() => libraryItem.value && store.getters['library/isInLibrary'](libraryItem.value.id))
+const savedItem = computed(() => libraryItem.value && store.getters['library/itemById'](libraryItem.value.id))
 const sortedReviews = computed(() => [...reviews.value].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)))
 
 function requireLogin() {
@@ -139,7 +141,7 @@ onMounted(async () => {
 
 <template>
   <div class="page-container book-detail-view">
-    <RouterLink :to="{ name: 'catalog' }" class="book-detail-view__back-link">
+    <RouterLink :to="{ name: 'catalog' }" class="book-detail-page__back-link">
       <AppIcon :path="mdiArrowLeft" :size="18" /> Retour au catalogue
     </RouterLink>
 
@@ -147,28 +149,28 @@ onMounted(async () => {
     <StatusMessage v-else-if="loadError" :message="loadError" />
 
     <template v-else-if="book">
-      <article class="book-detail-view__summary glass-panel">
+      <article class="book-detail-page__summary glass-panel">
         <BookCover :src="coverUrlFromIsbn(book.isbn, 'L')" :title="book.title" size="large" />
 
-        <div class="book-detail-view__information">
-          <span class="book-detail-view__type">{{ BOOK_TYPE_LABELS[book.type] ?? book.type }}</span>
-          <h1 class="book-detail-view__title">{{ book.title }}</h1>
-          <p class="book-detail-view__authors">
+        <div class="book-detail-page__information">
+          <span class="book-detail-page__type">{{ BOOK_TYPE_LABELS[book.type] ?? book.type }}</span>
+          <h1 class="book-detail-page__title">{{ book.title }}</h1>
+          <p class="book-detail-page__authors">
             {{ authorNames }}<template v-if="publishYear"> · {{ publishYear }}</template>
           </p>
 
-          <div class="book-detail-view__rating">
+          <div class="book-detail-page__row book-detail-view__rating">
             <StarRating :model-value="book.averageRating" readonly />
             <span>{{ reviews.length ? `${book.averageRating.toFixed(1)} / 5 · ${reviews.length} avis` : 'Pas encore noté' }}</span>
           </div>
 
-          <div class="book-detail-view__genres">
+          <div class="book-detail-page__row">
             <span v-for="genre in book.genres" :key="genre" class="badge">{{ GENRE_LABELS[genre] ?? genre }}</span>
           </div>
 
-          <p v-if="book.description" class="book-detail-view__description">{{ book.description }}</p>
+          <p v-if="book.description" class="book-detail-page__description">{{ book.description }}</p>
 
-          <div class="book-detail-view__stock">
+          <div class="book-detail-page__row">
             <span class="badge" :class="book.availableCopies > 0 ? 'badge--success' : 'badge--danger'">
               {{ book.availableCopies }} / {{ book.totalCopies }} exemplaire(s) disponible(s)
             </span>
@@ -179,7 +181,7 @@ onMounted(async () => {
 
           <StatusMessage v-if="actionMessage" :type="actionMessage.type" :message="actionMessage.text" />
 
-          <div class="book-detail-view__actions">
+          <div class="book-detail-page__row">
             <button
               type="button"
               class="button button--primary"
@@ -196,8 +198,10 @@ onMounted(async () => {
         </div>
       </article>
 
-      <section class="book-detail-view__reviews glass-panel">
-        <h2 class="book-detail-view__section-title">Avis des lecteurs</h2>
+      <LibraryItemPanel v-if="savedItem" :item="savedItem" />
+
+      <section class="book-detail-page__section glass-panel">
+        <h2 class="book-detail-page__section-title">Avis des lecteurs</h2>
 
         <form v-if="isAuthenticated" class="book-detail-view__review-form" @submit.prevent="submitReview">
           <div class="form-field">
@@ -240,77 +244,12 @@ onMounted(async () => {
   </div>
 </template>
 
+<style scoped src="@/assets/styles/book-detail-page.css"></style>
+
 <style scoped>
-.book-detail-view__back-link {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--color-text-on-dark);
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.book-detail-view__back-link:hover {
-  text-decoration: underline;
-}
-
-.book-detail-view__summary {
-  display: flex;
-  gap: 32px;
-  padding: 32px;
-}
-
-.book-detail-view__information {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  min-width: 0;
-}
-
-.book-detail-view__type {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-primary);
-}
-
-.book-detail-view__title {
-  font-size: 2rem;
-  line-height: 1.15;
-}
-
-.book-detail-view__authors {
-  font-size: 1.1rem;
-  color: var(--color-text-muted);
-}
-
-.book-detail-view__rating,
-.book-detail-view__genres,
-.book-detail-view__stock,
-.book-detail-view__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}
-
 .book-detail-view__rating span {
   font-size: 0.9rem;
   color: var(--color-text-muted);
-}
-
-.book-detail-view__reviews {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 28px 32px;
-}
-
-.book-detail-view__section-title {
-  font-size: 1.3rem;
 }
 
 .book-detail-view__review-form {
@@ -344,7 +283,7 @@ onMounted(async () => {
   gap: 6px;
   padding: 14px 16px;
   border-radius: var(--radius-small);
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--color-tile);
 }
 
 .book-detail-view__review-header {
@@ -358,21 +297,5 @@ onMounted(async () => {
   margin-left: auto;
   font-size: 0.82rem;
   color: var(--color-text-muted);
-}
-
-@media (max-width: 700px) {
-  .book-detail-view__summary {
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
-  }
-
-  .book-detail-view__title {
-    font-size: 1.5rem;
-  }
-
-  .book-detail-view__reviews {
-    padding: 20px;
-  }
 }
 </style>

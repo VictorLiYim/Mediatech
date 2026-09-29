@@ -24,10 +24,12 @@ function toSearchResult(doc) {
     title: doc.title,
     authors: doc.author_name ?? [],
     year: doc.first_publish_year ?? null,
+    coverId: doc.cover_i ?? null,
     coverUrl: coverUrlFromCoverId(doc.cover_i),
     isbn: pickIsbn(doc.isbn),
     allIsbns: doc.isbn ?? [],
     pageCount: doc.number_of_pages_median ?? null,
+    subjects: doc.subject ?? [],
   }
 }
 
@@ -39,6 +41,14 @@ export async function searchBooks(query, page = 1) {
     total: data.numFound,
     results: data.docs.map(toSearchResult),
   }
+}
+
+// Même format qu'un résultat de recherche, pour la page /book/:workId
+export async function fetchBookByWorkId(externalId) {
+  const { data } = await openLibraryClient.get('/search.json', {
+    params: { q: `key:/works/${externalId}`, limit: 1, fields: `${SEARCH_FIELDS},subject` },
+  })
+  return data.docs[0] ? toSearchResult(data.docs[0]) : null
 }
 
 export async function fetchWorkDescription(externalId) {

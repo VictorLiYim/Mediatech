@@ -130,7 +130,7 @@ onMounted(async () => {
 }
 
 .admin-stock-view__table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--color-tile);
 }
 
 .admin-stock-view__book-link {

@@ -44,7 +44,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', closeOnEscape))
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(30, 20, 60, 0.45);
+  background: var(--color-backdrop);
 }
 
 .modal-dialog {
@@ -52,7 +52,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', closeOnEscape))
   max-width: 640px;
   max-height: calc(100vh - 32px);
   overflow-y: auto;
-  background: rgba(245, 242, 255, 0.95);
+  background: var(--color-modal);
 }
 
 .modal-dialog__header {
