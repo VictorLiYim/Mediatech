@@ -2,9 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { mdiAccountCircle } from '@mdi/js'
 import { fetchUser } from '@/api/usersApi'
-import AppIcon from '@/components/AppIcon.vue'
 import LibraryStatistics from '@/components/LibraryStatistics.vue'
 
 const store = useStore()
@@ -29,8 +27,7 @@ onMounted(async () => {
 
 <template>
   <div class="page-container profile-view">
-    <section class="profile-view__card glass-panel">
-      <AppIcon :path="mdiAccountCircle" :size="88" class="profile-view__avatar" />
+    <section class="profile-view__card panel">
       <h1 class="profile-view__name">{{ store.getters['auth/userName'] }}</h1>
       <p v-if="profile" class="profile-view__email">{{ profile.email }}</p>
       <span class="badge" :class="{ 'badge--warning': isAdmin }">{{ isAdmin ? 'Administrateur' : 'Lecteur' }}</span>
@@ -54,16 +51,12 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 40px 24px;
+  padding: 32px 24px;
   text-align: center;
 }
 
-.profile-view__avatar {
-  color: var(--color-primary);
-}
-
 .profile-view__name {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
 }
 
 .profile-view__email {

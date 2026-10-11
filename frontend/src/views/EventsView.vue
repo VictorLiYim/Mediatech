@@ -2,11 +2,9 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { mdiAccountGroup, mdiCalendarBlank, mdiCalendarRemove, mdiFeather } from '@mdi/js'
 import { fetchAuthors } from '@/api/authorsApi'
 import { extractErrorMessage } from '@/api/client'
 import { fetchEvents, fetchRegistrations, registerToEvent, unregisterFromEvent } from '@/api/eventsApi'
-import AppIcon from '@/components/AppIcon.vue'
 import EmptyState from '@/components/EmptyState.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import StatusMessage from '@/components/StatusMessage.vue'
@@ -89,13 +87,12 @@ onMounted(async () => {
 
     <EmptyState
       v-else-if="upcomingEvents.length === 0"
-      :icon-path="mdiCalendarRemove"
       title="Aucun événement programmé"
       message="Revenez bientôt, de nouveaux rendez-vous arrivent régulièrement."
     />
 
     <ul v-else class="events-view__list">
-      <li v-for="event in upcomingEvents" :key="event.id" class="events-view__event glass-panel">
+      <li v-for="event in upcomingEvents" :key="event.id" class="events-view__event panel">
         <div class="events-view__event-header">
           <span class="badge">{{ EVENT_TYPE_LABELS[event.type] ?? event.type }}</span>
           <span v-if="registeredEventIds.has(event.id)" class="badge badge--success">Inscrit</span>
@@ -104,15 +101,12 @@ onMounted(async () => {
         <p v-if="event.description" class="events-view__event-description">{{ event.description }}</p>
         <ul class="events-view__event-facts">
           <li>
-            <AppIcon :path="mdiCalendarBlank" :size="18" />
             {{ formatDateTime(event.eventDate) }}
           </li>
           <li v-if="authorNames[event.authorId]">
-            <AppIcon :path="mdiFeather" :size="18" />
-            {{ authorNames[event.authorId] }}
+            Avec {{ authorNames[event.authorId] }}
           </li>
           <li>
-            <AppIcon :path="mdiAccountGroup" :size="18" />
             {{ event.capacity }} places
           </li>
         </ul>
@@ -144,7 +138,8 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 24px;
+  padding: 20px;
+  border-left: 3px solid var(--color-primary);
 }
 
 .events-view__event-header {
@@ -153,7 +148,7 @@ onMounted(async () => {
 }
 
 .events-view__event-title {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   line-height: 1.3;
 }
 
@@ -168,7 +163,7 @@ onMounted(async () => {
   margin: 0;
   padding: 0;
   list-style: none;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
 }
 
 .events-view__event-facts li {

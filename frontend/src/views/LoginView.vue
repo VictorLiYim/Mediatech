@@ -31,7 +31,7 @@ async function submitLogin() {
 
 <template>
   <div class="page-container auth-page">
-    <form class="auth-page__card glass-panel" @submit.prevent="submitLogin">
+    <form class="auth-page__card panel" @submit.prevent="submitLogin">
       <h1 class="auth-page__title">Connexion</h1>
       <p class="auth-page__subtitle">Retrouvez votre bibliothèque, vos favoris et vos emprunts.</p>
 

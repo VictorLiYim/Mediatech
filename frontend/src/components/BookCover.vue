@@ -44,9 +44,9 @@ const initials = computed(() =>
   flex-shrink: 0;
   aspect-ratio: 2 / 3;
   overflow: hidden;
-  border-radius: var(--radius-small);
-  box-shadow: 0 6px 18px rgba(38, 25, 84, 0.25);
-  background: var(--color-primary-soft);
+  border-radius: 2px;
+  box-shadow: var(--shadow-cover);
+  background: var(--color-cover-placeholder);
 }
 
 .book-cover--small {
@@ -74,14 +74,13 @@ const initials = computed(() =>
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(145deg, #8b7fc7, #4f3f8f);
+  background: var(--color-cover-placeholder);
 }
 
 .book-cover__initials {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--color-cover-placeholder-text);
   font-weight: 700;
   font-size: 1.4rem;
-  letter-spacing: 0.05em;
 }
 
 .book-cover--small .book-cover__initials {

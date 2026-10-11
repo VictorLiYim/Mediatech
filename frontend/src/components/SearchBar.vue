@@ -42,18 +42,17 @@ function submitSearch() {
   width: 100%;
   max-width: 720px;
   margin: 0 auto;
-  padding: 6px 6px 6px 22px;
+  padding: 0 0 0 14px;
   background: var(--color-surface-strong);
   border: 1px solid var(--color-surface-border);
-  border-radius: var(--radius-pill);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
-  transition: box-shadow var(--transition-fast);
+  border-radius: var(--radius-small);
+  overflow: hidden;
+  transition: border-color var(--transition-fast);
 }
 
 .search-bar:focus-within {
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6), var(--shadow-card);
+  border-color: var(--color-primary);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
 }
 
 .search-bar__input {
@@ -64,6 +63,7 @@ function submitSearch() {
   background: transparent;
   font-size: 1.05rem;
   outline: none;
+  -webkit-appearance: none;
 }
 
 .search-bar__input::placeholder {
@@ -75,30 +75,30 @@ function submitSearch() {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  align-self: stretch;
+  width: 52px;
+  min-height: 44px;
   border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--color-text);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
   cursor: pointer;
   transition: background var(--transition-fast);
 }
 
 .search-bar__button:not(:disabled):hover {
-  background: var(--color-primary-soft);
+  background: var(--color-primary-hover);
 }
 
 .search-bar__button:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: default;
 }
 
 .search-bar__spinner {
   width: 20px;
   height: 20px;
-  border: 3px solid var(--color-primary-soft);
-  border-top-color: var(--color-primary);
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  border-top-color: var(--color-on-primary);
   border-radius: 50%;
   animation: search-bar-spin 0.8s linear infinite;
 }

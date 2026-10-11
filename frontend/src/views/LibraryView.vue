@@ -1,7 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
-import { mdiBookshelf, mdiFilterRemoveOutline } from '@mdi/js'
 import EmptyState from '@/components/EmptyState.vue'
 import LibraryItemCard from '@/components/LibraryItemCard.vue'
 import LibraryStatistics from '@/components/LibraryStatistics.vue'
@@ -52,7 +51,6 @@ const displayedItems = computed(() => {
 
     <EmptyState
       v-if="totalCount === 0"
-      :icon-path="mdiBookshelf"
       title="Votre bibliothèque est vide"
       message="Recherchez un livre puis cliquez sur « Ajouter à ma bibliothèque »."
     >
@@ -61,7 +59,7 @@ const displayedItems = computed(() => {
     </EmptyState>
 
     <template v-else>
-      <section class="library-view__statistics glass-panel" aria-label="Statistiques">
+      <section class="library-view__statistics panel" aria-label="Statistiques">
         <LibraryStatistics />
       </section>
 
@@ -99,7 +97,6 @@ const displayedItems = computed(() => {
 
       <EmptyState
         v-if="displayedItems.length === 0"
-        :icon-path="mdiFilterRemoveOutline"
         title="Aucun livre dans cette sélection"
       />
       <div v-else class="book-grid">
@@ -111,7 +108,9 @@ const displayedItems = computed(() => {
 
 <style scoped>
 .library-view__statistics {
-  padding: 16px;
+  padding: 0;
+  border: none;
+  background: none;
 }
 
 .library-view__toolbar {
@@ -125,44 +124,37 @@ const displayedItems = computed(() => {
 .library-view__filter-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-  padding: 4px;
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  border: 1px solid var(--color-surface-border);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
+  gap: 0;
+  border-bottom: 1px solid var(--color-surface-border);
 }
 
 .library-view__filter-tab {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
+  margin-bottom: -1px;
+  padding: 8px 14px;
   border: none;
-  border-radius: var(--radius-pill);
+  border-bottom: 3px solid transparent;
   background: transparent;
-  font-weight: 600;
+  color: var(--color-text-muted);
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: color var(--transition-fast);
 }
 
 .library-view__filter-tab:hover {
-  background: var(--color-tile-hover);
+  color: var(--color-text);
 }
 
 .library-view__filter-tab--active {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-}
-
-.library-view__filter-tab--active:hover {
-  background: var(--color-primary-hover);
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .library-view__filter-count {
-  font-size: 0.78rem;
-  opacity: 0.8;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
 }
 
 .library-view__search-tools {

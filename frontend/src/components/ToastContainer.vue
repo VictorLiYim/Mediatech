@@ -60,9 +60,10 @@ const toasts = computed(() => store.getters['notifications/toasts'])
   width: 100%;
   padding: 12px 12px 12px 16px;
   border: 1px solid var(--color-surface-border);
-  border-radius: var(--radius-medium);
+  border-left: 3px solid var(--color-success);
+  border-radius: var(--radius-small);
   background: var(--color-modal);
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--shadow-overlay);
   pointer-events: auto;
 }
 
@@ -71,8 +72,17 @@ const toasts = computed(() => store.getters['notifications/toasts'])
   color: var(--color-success);
 }
 
+.toast--remove {
+  border-left-color: var(--color-danger);
+}
+
 .toast--remove .toast__icon {
   color: var(--color-danger);
+}
+
+.toast--favorite,
+.toast--unfavorite {
+  border-left-color: var(--color-favorite);
 }
 
 .toast--favorite .toast__icon,
@@ -83,24 +93,23 @@ const toasts = computed(() => store.getters['notifications/toasts'])
 .toast__message {
   flex: 1;
   min-width: 0;
-  font-size: 0.92rem;
-  font-weight: 500;
+  font-size: 0.95rem;
 }
 
 .toast__undo-button {
   flex-shrink: 0;
-  padding: 6px 10px;
+  padding: 4px 8px;
   border: none;
-  border-radius: var(--radius-pill);
-  background: var(--color-primary-soft);
+  border-radius: var(--radius-small);
+  background: transparent;
   color: var(--color-primary);
-  font-weight: 700;
-  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: underline;
   cursor: pointer;
 }
 
 .toast__undo-button:hover {
-  background: var(--color-navigation-active);
+  background: var(--color-primary-soft);
 }
 
 .toast__close-button {
@@ -108,7 +117,7 @@ const toasts = computed(() => store.getters['notifications/toasts'])
   display: inline-flex;
   padding: 4px;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-small);
   background: transparent;
   color: var(--color-text-muted);
   cursor: pointer;
@@ -120,13 +129,12 @@ const toasts = computed(() => store.getters['notifications/toasts'])
 
 .toast-enter-active,
 .toast-leave-active {
-  transition: opacity 200ms ease, transform 200ms ease;
+  transition: opacity 150ms ease;
 }
 
 .toast-enter-from,
 .toast-leave-to {
   opacity: 0;
-  transform: translateX(24px);
 }
 
 @media (max-width: 600px) {
@@ -135,11 +143,6 @@ const toasts = computed(() => store.getters['notifications/toasts'])
     left: 16px;
     bottom: 16px;
     width: auto;
-  }
-
-  .toast-enter-from,
-  .toast-leave-to {
-    transform: translateY(24px);
   }
 }
 </style>

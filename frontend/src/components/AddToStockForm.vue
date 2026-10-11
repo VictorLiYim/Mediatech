@@ -135,11 +135,11 @@ async function submitForm() {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 4px 10px;
   border: 1px solid var(--color-surface-border);
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-small);
   background: var(--color-surface-strong);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   cursor: pointer;
 }
 

@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useStore } from 'vuex'
 import {
-  mdiBookOpenPageVariant, mdiCheckCircle, mdiDeleteOutline, mdiHeart, mdiHeartOutline,
+  mdiHeart, mdiHeartOutline,
 } from '@mdi/js'
 import AppIcon from './AppIcon.vue'
 import BookCover from './BookCover.vue'
@@ -37,7 +37,7 @@ function removeItem() {
 </script>
 
 <template>
-  <article class="library-item-card glass-panel">
+  <article class="library-item-card panel">
     <button
       type="button"
       class="library-item-card__favorite-button"
@@ -75,7 +75,6 @@ function removeItem() {
 
     <div class="library-item-card__actions">
       <button type="button" class="button button--secondary button--small" @click="toggleRead">
-        <AppIcon :path="item.read ? mdiBookOpenPageVariant : mdiCheckCircle" :size="16" />
         {{ item.read ? 'Marquer non lu' : 'Marquer lu' }}
       </button>
       <RouterLink
@@ -91,7 +90,6 @@ function removeItem() {
         class="button button--danger button--small"
         @click="isConfirmingRemoval = true"
       >
-        <AppIcon :path="mdiDeleteOutline" :size="16" />
         Retirer
       </button>
       <div v-else class="library-item-card__confirmation">
@@ -112,33 +110,30 @@ function removeItem() {
   flex-direction: column;
   gap: 12px;
   padding: 14px;
-  border-radius: var(--radius-medium);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 
 .library-item-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-primary);
 }
 
 .library-item-card__favorite-button {
   position: absolute;
-  top: 22px;
-  right: 22px;
+  top: 20px;
+  right: 20px;
   z-index: 2;
   display: inline-flex;
-  padding: 8px;
-  border: none;
-  border-radius: 50%;
+  padding: 5px;
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-small);
   background: var(--color-floating-button);
   color: var(--color-text-muted);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   cursor: pointer;
-  transition: transform var(--transition-fast), color var(--transition-fast);
+  transition: color var(--transition-fast);
 }
 
 .library-item-card__favorite-button:hover {
-  transform: scale(1.1);
+  color: var(--color-favorite);
 }
 
 .library-item-card__favorite-button--active {
@@ -153,7 +148,8 @@ function removeItem() {
 }
 
 .library-item-card__title {
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
   line-height: 1.3;
 }
 
@@ -170,7 +166,7 @@ function removeItem() {
 }
 
 .library-item-card__link:focus-visible::after {
-  outline: 3px solid var(--color-primary);
+  outline: 2px solid var(--color-primary);
 }
 
 .library-item-card__authors,
@@ -215,7 +211,6 @@ function removeItem() {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-size: 0.9rem;
 }
 </style>

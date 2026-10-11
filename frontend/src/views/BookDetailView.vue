@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { mdiArrowLeft, mdiBookPlus, mdiCheck } from '@mdi/js'
+import { mdiArrowLeft } from '@mdi/js'
 import { extractErrorMessage } from '@/api/client'
 import { borrowBook, fetchBook, fetchLoans, fetchReviews, postReview, returnBook } from '@/api/booksApi'
 import { coverUrlFromIsbn, fetchFirstPublishYearByIsbn } from '@/api/openLibraryApi'
@@ -149,7 +149,7 @@ onMounted(async () => {
     <StatusMessage v-else-if="loadError" :message="loadError" />
 
     <template v-else-if="book">
-      <article class="book-detail-page__summary glass-panel">
+      <article class="book-detail-page__summary panel">
         <BookCover :src="coverUrlFromIsbn(book.isbn, 'L')" :title="book.title" size="large" />
 
         <div class="book-detail-page__information">
@@ -191,7 +191,6 @@ onMounted(async () => {
               {{ activeLoan ? 'Rendre ce livre' : 'Emprunter' }}
             </button>
             <button type="button" class="button button--secondary" :disabled="isInLibrary" @click="addToLibrary">
-              <AppIcon :path="isInLibrary ? mdiCheck : mdiBookPlus" :size="18" />
               {{ isInLibrary ? 'Dans ma bibliothèque' : 'Ajouter à ma bibliothèque' }}
             </button>
           </div>
@@ -200,7 +199,7 @@ onMounted(async () => {
 
       <LibraryItemPanel v-if="savedItem" :item="savedItem" />
 
-      <section class="book-detail-page__section glass-panel">
+      <section class="book-detail-page__section panel">
         <h2 class="book-detail-page__section-title">Avis des lecteurs</h2>
 
         <form v-if="isAuthenticated" class="book-detail-view__review-form" @submit.prevent="submitReview">
@@ -281,9 +280,8 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 14px 16px;
-  border-radius: var(--radius-small);
-  background: var(--color-tile);
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--color-surface-border);
 }
 
 .book-detail-view__review-header {
@@ -295,7 +293,7 @@ onMounted(async () => {
 
 .book-detail-view__review-date {
   margin-left: auto;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
 }
 </style>

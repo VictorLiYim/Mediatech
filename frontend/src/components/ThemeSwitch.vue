@@ -39,17 +39,17 @@ const isDark = computed(() => store.getters['theme/isDark'])
 }
 
 .theme-switch:focus-visible {
-  outline: 3px solid var(--color-primary);
+  outline: 2px solid var(--color-header-text);
 }
 
 .theme-switch__icon {
-  color: var(--color-text-muted);
-  opacity: 0.6;
+  color: var(--color-header-text-muted);
+  opacity: 0.7;
   transition: opacity var(--transition-fast), color var(--transition-fast);
 }
 
 .theme-switch__icon--active {
-  color: var(--color-primary);
+  color: var(--color-header-text);
   opacity: 1;
 }
 
@@ -58,13 +58,13 @@ const isDark = computed(() => store.getters['theme/isDark'])
   width: 40px;
   height: 22px;
   border-radius: var(--radius-pill);
-  background: var(--color-primary-soft);
-  border: 1px solid var(--color-surface-border);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   transition: background var(--transition-fast);
 }
 
 .theme-switch__track--on {
-  background: var(--color-primary);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .theme-switch__thumb {
@@ -75,7 +75,6 @@ const isDark = computed(() => store.getters['theme/isDark'])
   height: 16px;
   border-radius: 50%;
   background: #ffffff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
   transition: transform var(--transition-fast);
 }
 

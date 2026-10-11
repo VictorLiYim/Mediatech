@@ -2,7 +2,6 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { mdiBookSearchOutline, mdiEmoticonSadOutline } from '@mdi/js'
 import { extractErrorMessage } from '@/api/client'
 import { SEARCH_PAGE_SIZE, searchBooks } from '@/api/openLibraryApi'
 import EmptyState from '@/components/EmptyState.vue'
@@ -119,7 +118,6 @@ onMounted(() => {
 
       <EmptyState
         v-if="results.length === 0"
-        :icon-path="mdiEmoticonSadOutline"
         title="Aucun résultat"
         message="Essayez avec un autre titre ou le nom de l'auteur."
       />
@@ -148,7 +146,6 @@ onMounted(() => {
 
     <EmptyState
       v-else-if="!activeQuery"
-      :icon-path="mdiBookSearchOutline"
       title="Que voulez-vous lire ?"
       message="Tapez un titre (ex. « Dune ») ou un auteur. Cliquez sur un livre pour voir sa fiche, ou sur « + » pour l'ajouter à votre bibliothèque."
     />
@@ -159,9 +156,8 @@ onMounted(() => {
 .search-view__header {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  text-align: center;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 .search-view__search-bar {
@@ -169,8 +165,7 @@ onMounted(() => {
 }
 
 .search-view__result-count {
-  color: var(--color-text-on-dark);
-  font-weight: 500;
+  color: var(--color-text-muted);
 }
 
 .search-view__load-more {

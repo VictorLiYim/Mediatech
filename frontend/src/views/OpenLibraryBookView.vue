@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { mdiArrowLeft, mdiBookPlus, mdiCheck, mdiPackageVariantPlus } from '@mdi/js'
+import { mdiArrowLeft } from '@mdi/js'
 import { coverUrlFromCoverId, fetchBookByWorkId, fetchWorkDescription } from '@/api/openLibraryApi'
 import AddToStockForm from '@/components/AddToStockForm.vue'
 import AppIcon from '@/components/AppIcon.vue'
@@ -106,7 +106,7 @@ onMounted(() => {
     <StatusMessage v-else-if="loadError" :message="loadError" />
 
     <template v-else-if="book">
-      <article class="book-detail-page__summary glass-panel">
+      <article class="book-detail-page__summary panel">
         <BookCover :src="coverUrlFromCoverId(book.coverId, 'L')" :title="book.title" size="large" />
 
         <div class="book-detail-page__information">
@@ -139,7 +139,6 @@ onMounted(() => {
 
           <div class="book-detail-page__row">
             <button type="button" class="button button--primary" :disabled="!!savedItem" @click="addToLibrary">
-              <AppIcon :path="savedItem ? mdiCheck : mdiBookPlus" :size="18" />
               {{ savedItem ? 'Dans ma bibliothèque' : 'Ajouter à ma bibliothèque' }}
             </button>
             <RouterLink
@@ -150,7 +149,6 @@ onMounted(() => {
               Voir / emprunter
             </RouterLink>
             <button v-else-if="isAdmin" type="button" class="button button--secondary" @click="isAddingToStock = true">
-              <AppIcon :path="mdiPackageVariantPlus" :size="18" />
               Ajouter au stock
             </button>
           </div>

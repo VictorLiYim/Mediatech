@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { mdiAccountCircle, mdiBookshelf, mdiClose, mdiLogout, mdiMenu } from '@mdi/js'
+import { mdiAccountCircle, mdiClose, mdiLogout, mdiMenu } from '@mdi/js'
 import AppIcon from './AppIcon.vue'
 import ThemeSwitch from './ThemeSwitch.vue'
 
@@ -48,7 +48,6 @@ function logout() {
   <header class="app-header">
     <div class="app-header__inner">
       <RouterLink :to="{ name: 'home' }" class="app-header__brand">
-        <AppIcon :path="mdiBookshelf" :size="26" />
         <span>Médiatech</span>
       </RouterLink>
 
@@ -105,9 +104,7 @@ function logout() {
   top: 0;
   z-index: 20;
   background: var(--color-header);
-  border-bottom: 1px solid var(--color-surface-border);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
+  color: var(--color-header-text);
 }
 
 /* Pleine largeur : logo collé à gauche, compte + thème collés à droite */
@@ -123,9 +120,10 @@ function logout() {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 1.2rem;
+  margin-right: 12px;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: var(--color-primary);
+  color: var(--color-header-text);
   text-decoration: none;
 }
 
@@ -136,9 +134,10 @@ function logout() {
 
 .app-header__navigation {
   flex: 1;
+  align-self: stretch;
   display: flex;
-  align-items: center;
-  gap: 2px;
+  align-items: stretch;
+  gap: 4px;
 }
 
 .app-header__link,
@@ -146,25 +145,25 @@ function logout() {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 11px;
-  border-radius: var(--radius-pill);
-  font-weight: 500;
-  font-size: 0.9rem;
+  padding: 0 10px;
+  color: var(--color-header-text-muted);
+  font-size: 0.95rem;
   text-decoration: none;
   white-space: nowrap;
-  transition: background var(--transition-fast);
+  transition: color var(--transition-fast);
 }
 
 .app-header__link:hover,
 .app-header__profile-link:hover {
-  background: var(--color-primary-soft);
+  color: var(--color-header-text);
 }
 
+/* Lien actif : texte blanc + trait sous le lien */
 .app-header__link--active {
-  background: var(--color-navigation-active);
+  color: var(--color-header-text);
   font-weight: 600;
+  box-shadow: inset 0 -3px 0 var(--color-header-text);
 }
-
 
 .app-header__account {
   margin-left: auto;
@@ -176,22 +175,37 @@ function logout() {
 .app-header__logout-button,
 .app-header__menu-toggle {
   display: inline-flex;
-  padding: 8px;
+  padding: 6px;
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-small);
   background: transparent;
+  color: var(--color-header-text-muted);
   cursor: pointer;
-  transition: background var(--transition-fast);
+  transition: color var(--transition-fast);
 }
 
 .app-header__logout-button:hover,
 .app-header__menu-toggle:hover {
-  background: var(--color-primary-soft);
+  color: var(--color-header-text);
 }
 
 .app-header__menu-toggle {
   display: none;
   margin-left: auto;
+}
+
+/* Le bouton « Se connecter » ressort en blanc sur le header */
+.app-header .button--primary {
+  background: var(--color-header-text);
+  color: var(--color-header);
+}
+
+.app-header .button--primary:hover {
+  background: var(--color-header-text-muted);
+}
+
+:focus-visible {
+  outline-color: var(--color-header-text);
 }
 
 /* Écrans moyens : on garde tous les liens sur une ligne */
@@ -203,7 +217,7 @@ function logout() {
 
   .app-header__link,
   .app-header__profile-link {
-    padding: 8px 8px;
+    padding: 0 7px;
   }
 
   .app-header__profile-name,
@@ -235,21 +249,29 @@ function logout() {
     right: 0;
     flex-direction: column;
     align-items: stretch;
-    padding: 12px 16px 16px;
+    gap: 0;
+    padding: 4px 0 12px;
     background: var(--color-header);
-    border-bottom: 1px solid var(--color-surface-border);
-    backdrop-filter: var(--blur-glass);
-    -webkit-backdrop-filter: var(--blur-glass);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
   }
 
   .app-header__navigation--open {
     display: flex;
   }
 
+  .app-header__link,
+  .app-header__profile-link {
+    padding: 10px 16px;
+  }
+
+  .app-header__link--active {
+    box-shadow: inset 3px 0 0 var(--color-header-text);
+  }
+
   .app-header__account {
     margin-left: 0;
-    padding-top: 8px;
-    border-top: 1px solid var(--color-surface-border);
+    padding: 8px 16px 0 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
   }
 }
 </style>

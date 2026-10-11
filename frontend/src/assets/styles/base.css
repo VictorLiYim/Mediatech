@@ -15,8 +15,8 @@ body {
 body {
   font-family: var(--font-family);
   color: var(--color-text);
-  background: linear-gradient(160deg, var(--color-background-start) 0%, var(--color-background-end) 70%) fixed;
-  -webkit-font-smoothing: antialiased;
+  background: var(--color-background);
+  font-size: 1rem;
   line-height: 1.5;
 }
 
@@ -47,22 +47,24 @@ textarea {
 .page-title {
   font-size: 1.75rem;
   font-weight: 700;
-  color: var(--color-text-on-dark);
-  text-shadow: 0 2px 12px rgba(20, 10, 60, 0.25);
+  line-height: 1.2;
+  color: var(--color-text);
 }
 
 .page-subtitle {
   margin-top: 4px;
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--color-text-muted);
 }
 
-.glass-panel {
+.panel {
   background: var(--color-surface);
   border: 1px solid var(--color-surface-border);
-  border-radius: var(--radius-large);
-  box-shadow: var(--shadow-card);
-  backdrop-filter: var(--blur-glass);
-  -webkit-backdrop-filter: var(--blur-glass);
+  border-radius: var(--radius-medium);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .button {
@@ -70,23 +72,19 @@ textarea {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 18px;
+  padding: 8px 16px;
   border: 1px solid transparent;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-small);
   font-weight: 600;
   font-size: 0.95rem;
   text-decoration: none;
   cursor: pointer;
-  transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: background var(--transition-fast), border-color var(--transition-fast);
 }
 
 .button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
-}
-
-.button:not(:disabled):active {
-  transform: scale(0.97);
 }
 
 .button--primary {
@@ -99,8 +97,8 @@ textarea {
 }
 
 .button--secondary {
-  background: var(--color-surface-strong);
-  border-color: var(--color-surface-border);
+  background: transparent;
+  border-color: var(--color-primary);
   color: var(--color-primary);
 }
 
@@ -109,7 +107,8 @@ textarea {
 }
 
 .button--danger {
-  background: var(--color-danger-soft);
+  background: transparent;
+  border-color: var(--color-danger);
   color: var(--color-danger);
 }
 
@@ -118,8 +117,8 @@ textarea {
 }
 
 .button--small {
-  padding: 6px 12px;
-  font-size: 0.85rem;
+  padding: 4px 10px;
+  font-size: 0.875rem;
 }
 
 .form-field {
@@ -135,17 +134,17 @@ textarea {
 
 .form-input {
   width: 100%;
-  padding: 11px 14px;
+  padding: 8px 10px;
   border: 1px solid var(--color-surface-border);
   border-radius: var(--radius-small);
   background: var(--color-surface-strong);
-  outline: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 
 .form-input:focus {
+  outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-soft);
+  box-shadow: inset 0 0 0 1px var(--color-primary);
 }
 
 .form-error {
@@ -157,9 +156,9 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
-  border-radius: var(--radius-pill);
-  font-size: 0.78rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 0.8rem;
   font-weight: 600;
   background: var(--color-primary-soft);
   color: var(--color-primary);

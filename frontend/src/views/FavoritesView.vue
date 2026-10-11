@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from 'vue'
 import { useStore } from 'vuex'
-import { mdiHeartOutline } from '@mdi/js'
 import EmptyState from '@/components/EmptyState.vue'
 import LibraryItemCard from '@/components/LibraryItemCard.vue'
 
@@ -21,7 +20,6 @@ const favoriteItems = computed(() => store.getters['library/favoriteItems'])
 
     <EmptyState
       v-if="favoriteItems.length === 0"
-      :icon-path="mdiHeartOutline"
       title="Aucun favori pour l'instant"
       message="Cliquez sur le cœur d'un livre de votre bibliothèque pour l'ajouter ici."
     >

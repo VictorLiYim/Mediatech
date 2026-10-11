@@ -1,7 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
-import { mdiBookClockOutline } from '@mdi/js'
 import { extractErrorMessage } from '@/api/client'
 import { fetchLoans, returnBook } from '@/api/booksApi'
 import { coverUrlFromIsbn } from '@/api/openLibraryApi'
@@ -80,7 +79,6 @@ onMounted(async () => {
     <template v-else>
       <EmptyState
         v-if="loans.length === 0"
-        :icon-path="mdiBookClockOutline"
         title="Aucun emprunt"
         message="Empruntez un livre depuis le catalogue de la médiathèque."
       >
@@ -90,7 +88,7 @@ onMounted(async () => {
       <section v-if="activeLoans.length" class="loans-view__section">
         <h2 class="loans-view__section-title">En cours ({{ activeLoans.length }})</h2>
         <ul class="loans-view__list">
-          <li v-for="loan in activeLoans" :key="loan.id" class="loans-view__loan glass-panel">
+          <li v-for="loan in activeLoans" :key="loan.id" class="loans-view__loan panel">
             <BookCover :src="coverUrlFromIsbn(bookFor(loan)?.isbn, 'S')" :title="bookFor(loan)?.title ?? '?'" size="small" />
             <div class="loans-view__loan-information">
               <RouterLink :to="{ name: 'book-detail', params: { bookId: loan.bookId } }" class="loans-view__loan-title">
@@ -114,7 +112,7 @@ onMounted(async () => {
       <section v-if="returnedLoans.length" class="loans-view__section">
         <h2 class="loans-view__section-title">Historique ({{ returnedLoans.length }})</h2>
         <ul class="loans-view__list">
-          <li v-for="loan in returnedLoans" :key="loan.id" class="loans-view__loan loans-view__loan--returned glass-panel">
+          <li v-for="loan in returnedLoans" :key="loan.id" class="loans-view__loan loans-view__loan--returned panel">
             <BookCover :src="coverUrlFromIsbn(bookFor(loan)?.isbn, 'S')" :title="bookFor(loan)?.title ?? '?'" size="small" />
             <div class="loans-view__loan-information">
               <RouterLink :to="{ name: 'book-detail', params: { bookId: loan.bookId } }" class="loans-view__loan-title">
@@ -139,7 +137,6 @@ onMounted(async () => {
 }
 
 .loans-view__section-title {
-  color: var(--color-text-on-dark);
   font-size: 1.2rem;
 }
 
@@ -156,12 +153,11 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 14px 20px;
-  border-radius: var(--radius-medium);
+  padding: 12px 16px;
 }
 
 .loans-view__loan--returned {
-  opacity: 0.8;
+  background: var(--color-tile);
 }
 
 .loans-view__loan-information {
@@ -174,7 +170,7 @@ onMounted(async () => {
 }
 
 .loans-view__loan-title {
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: none;
 }
 
@@ -183,7 +179,7 @@ onMounted(async () => {
 }
 
 .loans-view__loan-dates {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--color-text-muted);
 }
 

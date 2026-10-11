@@ -1,10 +1,8 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
-import { mdiPlus } from '@mdi/js'
 import { extractErrorMessage } from '@/api/client'
 import AddToStockForm from '@/components/AddToStockForm.vue'
-import AppIcon from '@/components/AppIcon.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import ModalDialog from '@/components/ModalDialog.vue'
 import StatusMessage from '@/components/StatusMessage.vue'
@@ -47,7 +45,7 @@ onMounted(async () => {
       <div class="admin-stock-view__header-actions">
         <RouterLink :to="{ name: 'search' }" class="button button--secondary">Ajouter depuis Open Library</RouterLink>
         <button type="button" class="button button--primary" @click="isFormOpen = true">
-          <AppIcon :path="mdiPlus" :size="18" /> Saisie manuelle
+          Saisie manuelle
         </button>
       </div>
     </header>
@@ -56,7 +54,7 @@ onMounted(async () => {
     <StatusMessage v-if="successMessage" type="success" :message="successMessage" />
     <LoadingSpinner v-if="isLoading && books.length === 0" />
 
-    <div v-else class="admin-stock-view__table-wrapper glass-panel">
+    <div v-else class="admin-stock-view__table-wrapper panel">
       <table class="admin-stock-view__table">
         <thead>
           <tr>
@@ -108,20 +106,19 @@ onMounted(async () => {
 .admin-stock-view__table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.93rem;
+  font-size: 0.95rem;
 }
 
 .admin-stock-view__table th,
 .admin-stock-view__table td {
-  padding: 12px 16px;
+  padding: 10px 14px;
   text-align: left;
   border-bottom: 1px solid var(--color-surface-border);
 }
 
 .admin-stock-view__table th {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  background: var(--color-tile);
+  font-weight: 600;
   color: var(--color-text-muted);
 }
 
@@ -129,7 +126,7 @@ onMounted(async () => {
   border-bottom: none;
 }
 
-.admin-stock-view__table tbody tr:hover {
+.admin-stock-view__table tbody tr:nth-child(even) {
   background: var(--color-tile);
 }
 

@@ -20,7 +20,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', closeOnEscape))
 <template>
   <Teleport to="body">
     <div class="modal-dialog__backdrop" @click.self="emit('close')">
-      <section class="modal-dialog glass-panel" role="dialog" aria-modal="true" :aria-label="title">
+      <section class="modal-dialog panel" role="dialog" aria-modal="true" :aria-label="title">
         <header class="modal-dialog__header">
           <h2 class="modal-dialog__title">{{ title }}</h2>
           <button type="button" class="modal-dialog__close-button" @click="emit('close')">
@@ -53,6 +53,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', closeOnEscape))
   max-height: calc(100vh - 32px);
   overflow-y: auto;
   background: var(--color-modal);
+  box-shadow: var(--shadow-overlay);
 }
 
 .modal-dialog__header {
@@ -60,7 +61,8 @@ onBeforeUnmount(() => document.removeEventListener('keydown', closeOnEscape))
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 20px 24px 0;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-surface-border);
 }
 
 .modal-dialog__title {
@@ -71,8 +73,9 @@ onBeforeUnmount(() => document.removeEventListener('keydown', closeOnEscape))
   display: inline-flex;
   padding: 6px;
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-small);
   background: transparent;
+  color: var(--color-text-muted);
   cursor: pointer;
 }
 
@@ -81,6 +84,6 @@ onBeforeUnmount(() => document.removeEventListener('keydown', closeOnEscape))
 }
 
 .modal-dialog__body {
-  padding: 16px 24px 24px;
+  padding: 20px;
 }
 </style>

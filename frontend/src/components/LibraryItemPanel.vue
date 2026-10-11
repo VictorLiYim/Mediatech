@@ -1,11 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useStore } from 'vuex'
-import {
-  mdiBookOpenPageVariant, mdiCheckCircle, mdiDeleteOutline, mdiHeart, mdiHeartOutline,
-} from '@mdi/js'
 import { formatDate } from '@/utils/dates'
-import AppIcon from './AppIcon.vue'
 import StarRating from './StarRating.vue'
 
 // Bloc « Ma bibliothèque » des pages détail : lu, favori, note perso
@@ -34,7 +30,7 @@ function removeItem() {
 </script>
 
 <template>
-  <section class="library-item-panel glass-panel">
+  <section class="library-item-panel panel">
     <header class="library-item-panel__header">
       <h2 class="library-item-panel__title">Ma bibliothèque</h2>
       <span class="library-item-panel__added-at">Ajouté le {{ formatDate(item.addedAt) }}</span>
@@ -55,11 +51,9 @@ function removeItem() {
 
     <div class="library-item-panel__row">
       <button type="button" class="button button--secondary" @click="toggleRead">
-        <AppIcon :path="item.read ? mdiBookOpenPageVariant : mdiCheckCircle" :size="18" />
         {{ item.read ? 'Marquer non lu' : 'Marquer lu' }}
       </button>
       <button type="button" class="button button--secondary" :aria-pressed="item.favorite" @click="toggleFavorite">
-        <AppIcon :path="item.favorite ? mdiHeart : mdiHeartOutline" :size="18" class="library-item-panel__heart" />
         {{ item.favorite ? 'Retirer des favoris' : 'Ajouter aux favoris' }}
       </button>
       <button
@@ -68,7 +62,6 @@ function removeItem() {
         class="button button--danger"
         @click="isConfirmingRemoval = true"
       >
-        <AppIcon :path="mdiDeleteOutline" :size="18" />
         Retirer de ma bibliothèque
       </button>
       <template v-else>
@@ -85,7 +78,7 @@ function removeItem() {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 28px 32px;
+  padding: 24px;
 }
 
 .library-item-panel__header {
@@ -97,7 +90,7 @@ function removeItem() {
 }
 
 .library-item-panel__title {
-  font-size: 1.3rem;
+  font-size: 1.25rem;
 }
 
 .library-item-panel__added-at,
@@ -116,10 +109,6 @@ function removeItem() {
 .library-item-panel__label,
 .library-item-panel__confirmation {
   font-weight: 600;
-}
-
-.library-item-panel__heart {
-  color: var(--color-favorite);
 }
 
 @media (max-width: 700px) {

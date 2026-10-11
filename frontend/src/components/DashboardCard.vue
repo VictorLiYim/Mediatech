@@ -1,24 +1,20 @@
 <script setup>
-import AppIcon from './AppIcon.vue'
-
 defineProps({
   title: { type: String, required: true },
-  iconPath: { type: String, required: true },
   linkTo: { type: Object, default: null },
   linkLabel: { type: String, default: 'Tout voir' },
 })
 </script>
 
 <template>
-  <section class="dashboard-card glass-panel">
+  <section class="dashboard-card panel">
     <header class="dashboard-card__header">
-      <AppIcon :path="iconPath" :size="22" class="dashboard-card__icon" />
       <h2 class="dashboard-card__title">{{ title }}</h2>
     </header>
     <div class="dashboard-card__content">
       <slot />
     </div>
-    <RouterLink v-if="linkTo" :to="linkTo" class="dashboard-card__link">{{ linkLabel }} →</RouterLink>
+    <RouterLink v-if="linkTo" :to="linkTo" class="dashboard-card__link">{{ linkLabel }}</RouterLink>
   </section>
 </template>
 
@@ -26,22 +22,20 @@ defineProps({
 .dashboard-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 24px;
+  gap: 14px;
+  padding: 20px;
 }
 
 .dashboard-card__header {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.dashboard-card__icon {
-  color: var(--color-primary);
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-surface-border);
 }
 
 .dashboard-card__title {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   font-weight: 700;
 }
 
@@ -52,9 +46,8 @@ defineProps({
 .dashboard-card__link {
   align-self: flex-end;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--color-primary);
-  text-decoration: none;
 }
 
 .dashboard-card__link:hover {

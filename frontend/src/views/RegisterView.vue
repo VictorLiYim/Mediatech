@@ -43,7 +43,7 @@ async function submitRegistration() {
 
 <template>
   <div class="page-container auth-page">
-    <form class="auth-page__card glass-panel" @submit.prevent="submitRegistration">
+    <form class="auth-page__card panel" @submit.prevent="submitRegistration">
       <h1 class="auth-page__title">Créer un compte</h1>
       <p class="auth-page__subtitle">Gratuit, pour emprunter et construire votre bibliothèque.</p>
 

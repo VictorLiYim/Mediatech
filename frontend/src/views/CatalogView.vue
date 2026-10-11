@@ -1,7 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useStore } from 'vuex'
-import { mdiBookshelf, mdiFilterRemoveOutline } from '@mdi/js'
 import { extractErrorMessage } from '@/api/client'
 import EmptyState from '@/components/EmptyState.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
@@ -57,7 +56,7 @@ onMounted(async () => {
       </div>
     </header>
 
-    <section class="catalog-view__filters glass-panel" aria-label="Filtres">
+    <section class="catalog-view__filters panel" aria-label="Filtres">
       <input v-model="textFilter" class="form-input" type="search" placeholder="Titre ou auteur" aria-label="Filtrer par titre ou auteur">
       <select v-model="typeFilter" class="form-input" aria-label="Type">
         <option value="">Tous les types</option>
@@ -78,7 +77,6 @@ onMounted(async () => {
 
     <EmptyState
       v-else-if="!errorMessage && filteredBooks.length === 0"
-      :icon-path="books.length === 0 ? mdiBookshelf : mdiFilterRemoveOutline"
       :title="books.length === 0 ? 'Le catalogue est vide' : 'Aucun livre ne correspond'"
       :message="books.length === 0 ? '' : 'Modifiez ou réinitialisez les filtres.'"
     >
@@ -99,15 +97,13 @@ onMounted(async () => {
   grid-template-columns: 2fr 1fr 1fr auto;
   align-items: center;
   gap: 12px;
-  padding: 16px;
-  border-radius: var(--radius-medium);
+  padding: 12px;
 }
 
 .catalog-view__checkbox {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
 }

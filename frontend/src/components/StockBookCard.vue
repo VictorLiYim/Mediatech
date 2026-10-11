@@ -14,7 +14,7 @@ const isAvailable = computed(() => props.book.availableCopies > 0)
 </script>
 
 <template>
-  <RouterLink :to="{ name: 'book-detail', params: { bookId: book.id } }" class="stock-book-card glass-panel">
+  <RouterLink :to="{ name: 'book-detail', params: { bookId: book.id } }" class="stock-book-card panel">
     <BookCover :src="coverUrlFromIsbn(book.isbn)" :title="book.title" />
     <div class="stock-book-card__body">
       <span class="stock-book-card__type">{{ BOOK_TYPE_LABELS[book.type] ?? book.type }}</span>
@@ -34,14 +34,12 @@ const isAvailable = computed(() => props.book.availableCopies > 0)
   flex-direction: column;
   gap: 12px;
   padding: 14px;
-  border-radius: var(--radius-medium);
   text-decoration: none;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 
 .stock-book-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-primary);
 }
 
 .stock-book-card__body {
@@ -53,15 +51,13 @@ const isAvailable = computed(() => props.book.availableCopies > 0)
 }
 
 .stock-book-card__type {
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-primary);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
 }
 
 .stock-book-card__title {
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
   line-height: 1.3;
 }
 

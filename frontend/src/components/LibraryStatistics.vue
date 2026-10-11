@@ -65,29 +65,30 @@ const tileComponent = computed(() => (props.linked ? 'RouterLink' : 'div'))
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 16px 8px;
-  border-radius: var(--radius-medium);
-  background: var(--color-tile);
+  padding: 14px 8px;
+  border: 1px solid var(--color-surface-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
   text-align: center;
   text-decoration: none;
 }
 
 .library-statistics__tile--linked {
-  transition: background var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 
 .library-statistics__tile--linked:hover {
-  background: var(--color-tile-hover);
+  border-color: var(--color-primary);
 }
 
 .library-statistics__value {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   line-height: 1.1;
-  color: var(--color-primary);
+  color: var(--color-text);
 }
 
 .library-statistics__label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--color-text-muted);
 }
 </style>

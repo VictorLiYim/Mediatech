@@ -1,5 +1,5 @@
 <script setup>
-import { mdiCheck, mdiLibrary, mdiPlus } from '@mdi/js'
+import { mdiCheck, mdiPlus } from '@mdi/js'
 import AppIcon from './AppIcon.vue'
 import BookCover from './BookCover.vue'
 
@@ -13,7 +13,7 @@ const emit = defineEmits(['add'])
 </script>
 
 <template>
-  <article class="search-result-card glass-panel">
+  <article class="search-result-card panel">
     <button
       type="button"
       class="search-result-card__add-button"
@@ -41,10 +41,10 @@ const emit = defineEmits(['add'])
       <p class="search-result-card__year">{{ result.year ?? 'Année inconnue' }}</p>
       <div class="search-result-card__badges">
         <span v-if="isInStock" class="badge badge--success">
-          <AppIcon :path="mdiLibrary" :size="14" /> En médiathèque
+          En médiathèque
         </span>
         <span v-if="isInLibrary" class="badge">
-          <AppIcon :path="mdiCheck" :size="14" /> Dans ma bibliothèque
+          Dans ma bibliothèque
         </span>
       </div>
     </div>
@@ -59,39 +59,36 @@ const emit = defineEmits(['add'])
   gap: 12px;
   width: 100%;
   padding: 14px;
-  border-radius: var(--radius-medium);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast);
 }
 
 .search-result-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover);
+  border-color: var(--color-primary);
 }
 
 .search-result-card__add-button {
   position: absolute;
-  top: 22px;
-  right: 22px;
+  top: 20px;
+  right: 20px;
   z-index: 2;
   display: inline-flex;
-  padding: 8px;
-  border: none;
-  border-radius: 50%;
+  padding: 5px;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-small);
   background: var(--color-primary);
   color: var(--color-on-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  transition: transform var(--transition-fast), background var(--transition-fast);
+  transition: background var(--transition-fast);
 }
 
 .search-result-card__add-button:hover:not(:disabled) {
-  transform: scale(1.1);
   background: var(--color-primary-hover);
 }
 
 .search-result-card__add-button--done {
+  border-color: var(--color-surface-border);
   background: var(--color-floating-button);
-  color: var(--color-primary);
+  color: var(--color-success);
   cursor: default;
 }
 
@@ -103,8 +100,8 @@ const emit = defineEmits(['add'])
 }
 
 .search-result-card__title {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.05rem;
+  font-weight: 600;
   line-height: 1.3;
   text-decoration: none;
   display: -webkit-box;
@@ -122,7 +119,7 @@ const emit = defineEmits(['add'])
 }
 
 .search-result-card__title:focus-visible::after {
-  outline: 3px solid var(--color-primary);
+  outline: 2px solid var(--color-primary);
 }
 
 .search-result-card__authors {

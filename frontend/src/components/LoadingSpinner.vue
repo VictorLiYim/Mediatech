@@ -18,15 +18,14 @@ defineProps({
   justify-content: center;
   gap: 12px;
   padding: 32px;
-  color: var(--color-text-on-dark);
-  font-weight: 500;
+  color: var(--color-text-muted);
 }
 
 .loading-spinner__circle {
   width: 26px;
   height: 26px;
-  border: 3px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #fff;
+  border: 3px solid var(--color-primary-soft);
+  border-top-color: var(--color-primary);
   border-radius: 50%;
   animation: loading-spinner-rotate 0.8s linear infinite;
 }

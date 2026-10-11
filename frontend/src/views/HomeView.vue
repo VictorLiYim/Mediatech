@@ -2,7 +2,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { mdiBookClockOutline, mdiCalendarStar, mdiNewBox } from '@mdi/js'
 import { coverUrlFromIsbn } from '@/api/openLibraryApi'
 import { fetchLoans } from '@/api/booksApi'
 import { fetchEvents } from '@/api/eventsApi'
@@ -77,7 +76,7 @@ onMounted(() => {
     </section>
 
     <div class="home-view__dashboard">
-      <DashboardCard title="Nouveautés !" :icon-path="mdiNewBox" :link-to="{ name: 'catalog' }" link-label="Voir le catalogue">
+      <DashboardCard title="Nouveautés !" :link-to="{ name: 'catalog' }" link-label="Voir le catalogue">
         <p v-if="latestBooks.length === 0" class="home-view__empty-text">Le catalogue est vide pour l'instant.</p>
         <ul v-else class="home-view__list">
           <li v-for="book in latestBooks" :key="book.id">
@@ -92,7 +91,7 @@ onMounted(() => {
         </ul>
       </DashboardCard>
 
-      <DashboardCard title="Prochains événements" :icon-path="mdiCalendarStar" :link-to="{ name: 'events' }">
+      <DashboardCard title="Prochains événements" :link-to="{ name: 'events' }">
         <p v-if="upcomingEvents.length === 0" class="home-view__empty-text">Aucun événement programmé.</p>
         <ul v-else class="home-view__list">
           <li v-for="event in upcomingEvents" :key="event.id" class="home-view__event-row">
@@ -105,7 +104,6 @@ onMounted(() => {
 
       <DashboardCard
         title="Prochains rendus"
-        :icon-path="mdiBookClockOutline"
         :link-to="isAuthenticated ? { name: 'loans' } : null"
         link-label="Mes emprunts"
       >
@@ -128,14 +126,13 @@ onMounted(() => {
 .home-view__hero {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  padding-top: 16px;
-  text-align: center;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 8px 0 4px;
 }
 
 .home-view__search-bar {
-  margin-top: 20px;
+  margin: 16px 0 0;
 }
 
 .home-view__dashboard {
@@ -151,7 +148,7 @@ onMounted(() => {
 .home-view__list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -175,7 +172,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .home-view__row-text span {
@@ -190,7 +187,7 @@ onMounted(() => {
 }
 
 .home-view__row-date {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: var(--color-text-muted);
 }
 

@@ -77,10 +77,5 @@ function select(position) {
   border: none;
   background: transparent;
   cursor: pointer;
-  transition: transform var(--transition-fast);
-}
-
-.star-rating__button:hover {
-  transform: scale(1.15);
 }
 </style>
